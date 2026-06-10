@@ -426,14 +426,89 @@ function loadFromFirebase() {
             document.getElementById("syncStatus").innerHTML = "✅ SAC4 Firebase Aktif (Yeni)";
             document.getElementById("syncStatus").className = "sync-status online";
         }
-        if(aktifKullanici) { rolBilgiGuncelle(); stokDuzenleButonKontrol(); excelButonlariniKontrol(); }
+// loadFromFirebase içinde, en sonda:
+if(aktifKullanici) { rolBilgiGuncelle(); stokDuzenleButonKontrol(); excelButonlariniKontrol(); }
+yeniStoklariKontrolEtVeGuncelle(); // ← BUNU EKLE
     }).catch(e => {
         console.error("Firebase okuma hatası:", e);
         document.getElementById("syncStatus").innerHTML = "⚠️ Bağlantı hatası";
         document.getElementById("syncStatus").className = "sync-status offline";
     });
 }
-
+// YENİ STOKLARI FIREBASE'E ZORLA YAZ (loadFromFirebase sonrası)
+function yeniStoklariKontrolEtVeGuncelle() {
+    let guncellendi = false;
+    const tumYeniStoklar = {
+        "HC1.0015": { isim: "430 SB 0,5X1680X1000 PASLANMAZ SAC PLAKA", plaka: 6.6400 },
+        "HC1.0018": { isim: "430 SB 0,5X1590X850 PASLANMAZ SAC PLAKAS", plaka: 5.3400 },
+        "HC1.0021": { isim: "430 SB 0,8X2050X900 PASLANMAZ SAC PLAKA", plaka: 11.6600 },
+        "HC1.0022": { isim: "430 SB 0,8X1600X1030 PASLANMAZ SAC PLAKA", plaka: 10.9400 },
+        "HC1.0024": { isim: "430 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA", plaka: 28.4400 },
+        "HC1.0025": { isim: "430 SB 0,8X1750X800 PASLANMAZ SAC PLAKA", plaka: 8.8500 },
+        "HC1.0027": { isim: "430 SB 1X3000X1500 PASLANMAZ SAC PLAKA", plaka: 35.5500 },
+        "HC1.0052": { isim: "430 SB 0,8X2000X1000 PASLANMAZ SAC PLAKA", plaka: 12.3400 },
+        "HC1.0058": { isim: "430 SB 0,8X1250X2500 PASLANMAZ SAC PLAKA", plaka: 19.7500 },
+        "HC1.0062": { isim: "430 SB 0,5X535X425 PASLANMAZ SAC PLAKA (TEZGAH TİP KAPI İÇ SACI)", plaka: 0.9000 },
+        "HC1.0064": { isim: "430 SB 1X2000X1000 PASLANMAZ SAC PLAKA", plaka: 15.8000 },
+        "HC1.0073": { isim: "430 SB 0,6X1750X850 PASLANMAZ SAC PLAKA", plaka: 7.0500 },
+        "HC1.0074": { isim: "430 SB 0,6X2100X950 PASLANMAZ SAC PLAKA", plaka: 9.4600 },
+        "HC1.0075": { isim: "430 SB 1X1660X850 PASLANMAZ SAC PLAKA", plaka: 11.1500 },
+        "HC1.0076": { isim: "430 SB 1X2120X850 PASLANMAZ SAC PLAKA", plaka: 14.2400 },
+        "HC1.0077": { isim: "430 SB 1X2660X850 PASLANMAZ SAC PLAKA", plaka: 17.8600 },
+        "HC1.0078": { isim: "430 SB 0,6X1250X2500MM PASLANMAZ SAC PLAKA", plaka: 2.0000 },
+        "HG1.0004": { isim: "GALVANİZ SAC 1,5X3000X1500 PLAKA SAC", plaka: 55.6200 },
+        "HG1.0007": { isim: "GALVANİZ 0,5X800X3000 PLAKA SAC", plaka: 9.4800 },
+        "HG1.0008": { isim: "GALVANİZ 0,5X800X2800 PLAKA SAC", plaka: 8.8500 },
+        "HG1.0010": { isim: "GALVANİZ 0,5X800X2080 PLAKA SAC", plaka: 6.6000 },
+        "HG1.0011": { isim: "GALVANİZ 0,5X800X1700 PLAKA SAC", plaka: 5.3700 },
+        "HG1.0012": { isim: "GALVANİZ 0,5X1500X3000 PLAKA SAC", plaka: 17.7700 },
+        "HG1.0013": { isim: "GALVANİZ 3X2000X1000 PLAKA SAC", plaka: 48.0500 },
+        "HG1.0016": { isim: "GALVANİZ 0,5X1250X2500 PLAKA SAC", plaka: 12.3400 },
+        "HG1.0018": { isim: "GALVANİZ SAC 1,5X2500X1250 PLAKA SAC", plaka: 37.0300 },
+        "HG1.0019": { isim: "GALVANİZ BOYALI SAC 0,5X1250X2000 RAL 9002 (BEYAZ)", plaka: 9.8800 },
+        "HG1.0020": { isim: "GALVANİZ 0,5X2000X1000 PLAKA SAC", plaka: 7.9000 },
+        "HG1.0021": { isim: "GALVANİZ BOYALI SAC 0,5X1250X2300 RAL 9002 (BEYAZ)", plaka: 11.3600 },
+        "HN1.0011": { isim: "304 SB 1X3000X1500 PASLANMAZ SAC PLAKA", plaka: 48.0500 },
+        "HN1.0012": { isim: "304 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA", plaka: 28.4400 },
+        "HN1.0013": { isim: "304 SB 0,5X1590X850 PASLANMAZ SAC PLAKAS", plaka: 5.3400 },
+        "HN1.0015": { isim: "304 SB 0,5X2000X1000 PASLANMAZ SAC PLAKA", plaka: 7.9000 },
+        "HN1.0016": { isim: "304 SB 0,5X1560X1000 PASLANMAZ SAC PLAKA", plaka: 6.1600 },
+        "HN1.0018": { isim: "304 SB 0,5X3000X1500 PASLANMAZ SAC PLAKA", plaka: 17.7700 },
+        "HN1.0019": { isim: "304 SB 0,8X1030X1600 PASLANMAZ SAC PLAKA", plaka: 10.4100 },
+        "HN1.0020": { isim: "304 SB 0,5X1000X1680 PASLANMAZ SAC PLAKA", plaka: 6.6400 },
+        "HN1.0021": { isim: "304 SB 0,8X2050X900 PASLANMAZ SAC PLAKA", plaka: 11.6600 },
+        "HN1.0022": { isim: "304 SB 0,8X1750X800 PASLANMAZ SAC PLAKA", plaka: 8.8500 },
+        "HN1.0025": { isim: "304 SB 0,8X2000X1000 PASLANMAZ SAC PLAKA", plaka: 12.3400 },
+        "HN1.0026": { isim: "304 SB 0,8X2500X1250 PASLANMAZ SAC PLAKA", plaka: 19.7500 },
+        "HN1.0028": { isim: "304 SB 1X2000X1000 PASLANMAZ SAC", plaka: 15.8000 },
+        "HN1.0029": { isim: "304 SB 0,5X1515X595 MM (610 KAPI İÇ SACI)", plaka: 3.5600 },
+        "HN1.0032": { isim: "304 SB 0,5X1250X2500 PASLANMAZ SAC PLAKA", plaka: 12.3400 },
+        "HN1.0035": { isim: "304 SB 1X2660X850 PASLANMAZ SAC PLAKA", plaka: 17.8600 },
+        "HN1.0036": { isim: "304 SB 0,6X1750X850 PASLANMAZ SAC PLAKA", plaka: 7.0500 },
+        "HN1.0037": { isim: "304 SB 0,6X2100X950 PASLANMAZ SAC PLAKA", plaka: 9.4600 },
+        "HN1.0038": { isim: "304 SB 1X1660X850 PASLANMAZ SAC", plaka: 11.1500 },
+        "HN1.0040": { isim: "304 SB 1X2120X850 PASLANMAZ SAC", plaka: 14.2400 },
+        "HN1.0043": { isim: "304 SB 0,5X535X425 PASLANMAZ SAC (TEZGAH TİP KAPI İÇ SACI)", plaka: 0.9000 },
+        "HN1.0048": { isim: "304 SB 2X1000X2000 PASLANMAZ SAC", plaka: 28.4400 },
+        "HX1.0045": { isim: "316 SB 0,8X1250X2500 PASLANMAZ SAC", plaka: 35.5500 },
+        "HX1.0046": { isim: "201 SB 0,8X1030X2000 PASLANMAZ SAC PLAKA", plaka: 12.9900 }
+    };
+    
+    Object.keys(tumYeniStoklar).forEach(k => {
+        if(!stokBilgileri[k]) {
+            stokBilgileri[k] = tumYeniStoklar[k].isim;
+            plakaWeights[k] = tumYeniStoklar[k].plaka;
+            guncellendi = true;
+        }
+    });
+    
+    if(guncellendi) {
+        stokGruplariniGuncelle();
+        urunleriGuncelle();
+        saveToFirebase();
+        console.log("✅ Yeni stoklar Firebase'e kaydedildi!");
+    }
+}
 function syncData() { saveToFirebase(); }
 function getSiraNo() { let ms = siraNo + 1; while(silinenSiralar.includes(ms)) ms++; return ms; }
 function siranoArtir() { siraNo++; syncData(); }
