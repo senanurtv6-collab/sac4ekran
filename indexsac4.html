@@ -4,115 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>SAC4 - Sac Kesim Takip Sistemi</title>
-    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    
     <style>
         :root {
-            --bg: #0a1628;
-            --primary: #4fc3f7;
-            --danger: #ef5350;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --text: #fff;
-            --card-bg: #ffffff;
-            --dark-heading: #2c3e50;
+            --bg: #0a1628; --primary: #4fc3f7; --danger: #ef5350;
+            --success: #27ae60; --warning: #f39c12; --text: #fff;
+            --card-bg: #ffffff; --dark-heading: #2c3e50; --muted: #90a4ae;
+            --border: rgba(255,255,255,0.1); --input-bg: rgba(255,255,255,0.08);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); min-height: 100vh; }
 
-        .login-page {
-            width: 100%; height: 100vh;
-            background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 50%, #0a1628 100%);
-            display: flex; justify-content: center; align-items: center;
-            position: relative; overflow: hidden;
-        }
-
-        .login-container {
-            background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
-            padding: 50px 40px; width: 420px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: 1;
-        }
-
+        .login-page { width: 100%; height: 100vh; background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 50%, #0a1628 100%); display: flex; justify-content: center; align-items: center; }
+        .login-container { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 20px; padding: 50px 40px; width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         .login-logo { text-align: center; margin-bottom: 30px; }
         .login-logo h1 { color: var(--text); font-size: 32px; font-weight: 700; }
         .login-logo h1 span { color: var(--primary); }
-        .login-logo p { color: #90a4ae; font-size: 14px; margin-top: 5px; letter-spacing: 4px; text-transform: uppercase; }
-        
-        .sync-badge {
-            background: var(--primary); color: #0a1628;
-            font-size: 10px; padding: 3px 10px; border-radius: 20px;
-            display: inline-block; margin-top: 10px; font-weight: 600;
-        }
-
-        .user-badge {
-            background: rgba(79,195,247,0.15); border: 1px solid rgba(79,195,247,0.3);
-            border-radius: 20px; padding: 6px 15px; color: var(--primary);
-            font-size: 13px; margin-top: 15px; text-align: center;
-        }
-
+        .login-logo p { color: var(--muted); font-size: 14px; margin-top: 5px; letter-spacing: 4px; text-transform: uppercase; }
+        .sync-badge { background: var(--primary); color: #0a1628; font-size: 10px; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-top: 10px; font-weight: 600; }
+        .user-badge { background: rgba(79,195,247,0.15); border: 1px solid rgba(79,195,247,0.3); border-radius: 20px; padding: 6px 15px; color: var(--primary); font-size: 13px; margin-top: 15px; text-align: center; }
         .login-form .form-group { margin-bottom: 20px; }
         .login-form label { color: #b0bec5; font-size: 13px; font-weight: 500; display: block; margin-bottom: 6px; }
-        
-        .login-form input {
-            width: 100%; padding: 12px 15px;
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 10px; color: var(--text); font-size: 15px; transition: all 0.3s;
-        }
+        .login-form input { width: 100%; padding: 12px 15px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 15px; transition: all 0.3s; }
         .login-form input:focus { outline: none; border-color: var(--primary); }
-        .login-form input::placeholder { color: #546e7a; }
-
-        .login-btn {
-            width: 100%; padding: 14px;
-            background: linear-gradient(135deg, var(--primary), #0288d1);
-            border: none; border-radius: 10px;
-            color: var(--text); font-size: 16px; font-weight: 600;
-            cursor: pointer; transition: all 0.3s;
-            letter-spacing: 1px; text-transform: uppercase;
-        }
+        .login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary), #0288d1); border: none; border-radius: 10px; color: var(--text); font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; letter-spacing: 1px; text-transform: uppercase; }
         .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(79,195,247,0.4); }
-
         .login-error { color: var(--danger); font-size: 13px; text-align: center; margin-top: 12px; display: none; }
 
         .main-page { display: none; width: 100%; min-height: 100vh; background: #f5f7fb; padding: 20px; }
-
-        .container {
-            max-width: 1400px; margin: 0 auto; background: var(--card-bg);
-            padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        h1 { color: var(--dark-heading); margin-bottom: 20px; font-size: 26px; display: flex; align-items: center; gap: 12px; }
+        .container { max-width: 1400px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h1 { color: var(--dark-heading); margin-bottom: 20px; font-size: 26px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         h2 { color: var(--dark-heading); margin-bottom: 15px; }
+        h3 { color: #2980b9; margin: 20px 0 10px; }
 
         .header-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-
-        .btn {
-            background: var(--success); color: white; border: none;
-            padding: 10px 20px; cursor: pointer; border-radius: 8px;
-            font-size: 14px; font-weight: 500; transition: all 0.2s;
-        }
+        .btn { background: var(--success); color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
         .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .btn:disabled { background: #95a5a6; cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.6; }
-
         .btn-secondary { background: #2980b9; }
         .btn-danger { background: #e74c3c; }
         .btn-warning { background: var(--warning); }
         .btn-info { background: #00bcd4; color: white; }
+        .btn-purple { background: #8e44ad; color: white; }
         .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-xs { padding: 4px 8px; font-size: 11px; }
 
-        .logout-btn { background: #e74c3c; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+        .logout-btn { background: #e74c3c; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; }
         .logout-btn:hover { background: #c0392b; }
 
-        .user-info {
-            background: #e8f4f8; padding: 15px 20px; border-radius: 10px;
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
-        }
+        .user-info { background: #e8f4f8; padding: 15px 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .user-info span { font-weight: bold; color: var(--dark-heading); font-size: 15px; }
+        .admin-badge { background: #8e44ad; color: white; padding: 3px 10px; border-radius: 12px; font-size: 11px; margin-left: 8px; }
+        .kullanici-badge { background: #e3f2fd; color: #1565c0; padding: 3px 10px; border-radius: 12px; font-size: 11px; margin-left: 8px; }
 
         .sync-status { font-size: 12px; margin-left: 10px; }
         .sync-status.online { color: #27ae60; }
@@ -120,14 +64,12 @@
 
         .form-group { margin: 15px 0; }
         label { font-weight: 600; display: block; margin-bottom: 5px; color: #333; font-size: 13px; }
-        
-        select, input[type="text"], input[type="number"], input[type="date"] {
-            width: 100%; padding: 10px 12px; border: 1px solid #ddd;
-            border-radius: 8px; font-size: 14px; transition: border 0.2s;
-        }
+        select, input[type="text"], input[type="number"], input[type="date"], input[type="password"] { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; transition: border 0.2s; }
         select:focus, input:focus { outline: none; border-color: #2980b9; }
 
         .info-note { background: #fff3cd; border: 1px solid #ffe69c; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404; font-size: 14px; }
+        .admin-note { background: #e8f5e9; border: 1px solid #66bb6a; padding: 15px; border-radius: 8px; margin: 15px 0; color: #2e7d32; font-size: 14px; }
+        .user-note { background: #fff3cd; border: 1px solid #ff9800; padding: 15px; border-radius: 8px; margin: 15px 0; color: #e65100; font-size: 14px; }
 
         table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
         th, td { border: 1px solid #e0e0e0; padding: 8px 10px; text-align: center; }
@@ -135,7 +77,6 @@
         th.sortable { cursor: pointer; user-select: none; }
         th.sortable:hover { background-color: #34495e; }
         th .sort-arrow { margin-left: 4px; font-size: 10px; }
-
         tr:hover { background-color: #f8fafc; }
         tr.kilitli { background-color: #fff8e1; }
 
@@ -143,16 +84,10 @@
         .plaka-input { width: 80px; background: #f0f0f0; padding: 6px; text-align: center; font-size: 12px; border: 1px solid #ddd; border-radius: 4px; }
         .toplam-input { width: 90px; background: #e8f5e9; font-weight: bold; padding: 6px; text-align: center; font-size: 12px; border: 1px solid #ddd; border-radius: 4px; }
         .checkbox-col { width: 40px; }
-
         .gecmis-table-container { max-height: 600px; overflow-y: auto; border: 1px solid #e0e0e0; margin: 10px 0; border-radius: 8px; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; }
-
-        .modal-content {
-            background: white; margin: 3% auto; padding: 25px;
-            width: 95%; max-width: 900px; border-radius: 12px;
-            position: relative; max-height: 90vh; overflow-y: auto;
-        }
+        .modal-content { background: white; margin: 3% auto; padding: 25px; width: 95%; max-width: 900px; border-radius: 12px; position: relative; max-height: 90vh; overflow-y: auto; }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: #999; }
         .close-modal:hover { color: #333; }
 
@@ -169,20 +104,13 @@
         .edit-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .edit-table th { background: #2980b9; font-size: 11px; }
         .edit-table td { padding: 6px; }
-
         .kalem-ekle-btn { background: var(--success); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; margin-top: 10px; font-size: 14px; }
         .kalem-sil-btn { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-
         .action-buttons { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
 
         .filtre-satir { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; }
         .filtre-satir > div { flex: 1; min-width: 140px; }
-
-        .excel-actions {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 15px; gap: 10px; flex-wrap: wrap;
-            background: #e3f2fd; padding: 12px 15px; border-radius: 8px;
-        }
+        .excel-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; background: #e3f2fd; padding: 12px 15px; border-radius: 8px; }
         .select-info { font-size: 14px; color: #1565c0; font-weight: 500; }
 
         .hidden { display: none !important; }
@@ -195,12 +123,15 @@
         .toplam-display { width: 80px; padding: 6px; text-align: center; background: #e8f8e8; font-weight: bold; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; }
         .edit-aciklama { width: 130px; padding: 6px; border: 1px solid #4fc3f7; border-radius: 4px; font-size: 11px; }
         .stok-isim { font-size: 11px; color: #666; text-align: left; }
+        .kilitli-bilgi { background: #ffe0b2; border: 1px solid #ff9800; padding: 12px 18px; border-radius: 8px; margin: 10px 0; color: #e65100; font-weight: 600; display: flex; align-items: center; gap: 10px; }
 
-        .kilitli-bilgi {
-            background: #ffe0b2; border: 1px solid #ff9800;
-            padding: 12px 18px; border-radius: 8px; margin: 10px 0;
-            color: #e65100; font-weight: 600; display: flex; align-items: center; gap: 10px;
-        }
+        .stok-duzenle-section { background: #f8f9fa; padding: 25px; border-radius: 10px; margin: 20px 0; border: 2px solid #8e44ad; }
+        .stok-duzenle-section h3 { color: #8e44ad; margin-bottom: 20px; font-size: 20px; }
+        .stok-form-row { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
+        .stok-form-row > div { flex: 1; min-width: 150px; }
+        .stok-card { background: white; padding: 12px 15px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; border-left: 4px solid #2980b9; }
+        .stok-arama { margin-bottom: 15px; }
+        .stok-arama input { padding: 10px; border: 2px solid #2980b9; border-radius: 6px; width: 100%; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -218,7 +149,7 @@
             <button type="button" class="login-btn" id="loginBtn">GİRİŞ YAP</button>
             <div class="login-error" id="loginError">Kullanıcı adı veya şifre hatalı!</div>
         </form>
-        <div class="user-badge">👤 SAC4 Kullanıcısı</div>
+        <div class="user-badge">👤 SAC4 Sistemi</div>
     </div>
 </div>
 
@@ -227,9 +158,14 @@
         <h1>📋 SAC4 Günlük Sac Kesim <span id="syncStatus" class="sync-status">🔄 Bağlanıyor...</span></h1>
 
         <div class="user-info">
-            <span>👤 Hoş geldiniz, <span id="currentUser">-</span></span>
-            <button class="logout-btn" id="logoutBtn">Çıkış Yap</button>
+            <span>👤 <span id="currentUser">-</span> <span id="userRolBadge"></span></span>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-purple" id="stokDuzenleBtn" style="display:none;">📦 Stok Düzenle</button>
+                <button class="logout-btn" id="logoutBtn">Çıkış Yap</button>
+            </div>
         </div>
+
+        <div id="rolBilgiAlani"></div>
 
         <div class="header-buttons">
             <button class="btn" id="yeniGirisBtn">➕ Yeni Giriş</button>
@@ -237,8 +173,6 @@
         </div>
 
         <div id="yeniGirisAlan">
-            <div class="info-note">⚠️ <strong>SAC4 Özel Sistem:</strong> Bu sistem sadece SAC4 kullanıcısına aittir. Tüm veriler SAC4'ün özel Firebase veritabanında saklanır.</div>
-
             <div class="form-group">
                 <label>Stok Grubu Seçiniz:</label>
                 <select id="stokGrubu">
@@ -249,14 +183,11 @@
                     <option value="HRD">HRD (Tümü)</option>
                 </select>
             </div>
-
             <div class="form-group" id="urunSecim" style="display:none;">
                 <label>Ürün Seçiniz (Ctrl+Click ile çoklu seçim):</label>
                 <select id="urunKodu" multiple size="8" style="height:180px; font-size:13px;"></select>
             </div>
-
             <div id="tabloAlan" style="display:none;"></div>
-
             <div class="action-buttons">
                 <button class="btn" id="kaydetBtn">💾 Kaydet</button>
                 <button class="btn btn-secondary" id="kayitSonrasiGecmisBtn">📂 Kaydet ve Önceki Girişlere Git</button>
@@ -266,7 +197,6 @@
 
         <div id="oncekiGirislerAlan" class="hidden">
             <h2>📂 SAC4 Önceki Girişler</h2>
-
             <div class="filtre-satir">
                 <div><label>Seri No</label><input type="text" id="filtre_seri" placeholder="Filtrele..."></div>
                 <div><label>Sıra No</label><input type="text" id="filtre_sira" placeholder="Filtrele..."></div>
@@ -277,7 +207,6 @@
                     <button class="btn btn-danger btn-sm" id="filtreTemizleBtn">🗑️ Temizle</button>
                 </div>
             </div>
-
             <div class="excel-actions" id="excelActionsDiv">
                 <div class="select-info">✅ <span id="seciliSayi">0</span> evrak seçili</div>
                 <div>
@@ -286,15 +215,33 @@
                     <button class="btn btn-secondary btn-sm" id="secimiTemizleBtn">⬜ Seçimi Temizle</button>
                 </div>
             </div>
-
             <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                 <span id="kayitSayisi" style="padding:8px; background:#e8f4f8; border-radius:6px; font-size:13px;"></span>
             </div>
-
             <div class="gecmis-table-container" id="gecmisTablosu"></div>
             <div class="pagination" id="paginationContainer"></div>
-
             <div style="margin-top:20px;"><button class="btn btn-secondary" id="yeniKayitDonBtn">➕ Yeni Kayıt Ekranına Dön</button></div>
+        </div>
+
+        <div id="stokDuzenleAlan" class="hidden">
+            <h2>📦 Stok Düzenleme <span class="admin-badge">Sadece Admin</span></h2>
+            <div class="stok-duzenle-section">
+                <h3>➕ Yeni Stok Ekle</h3>
+                <div class="stok-form-row">
+                    <div><label>Grup</label><select id="yeniStokGrup"><option value="430">430</option><option value="DKP">DKP</option><option value="GALVANIZ">GALVANİZ</option><option value="304">304</option><option value="316">316</option><option value="201">201</option></select></div>
+                    <div><label>Stok Kodu</label><input type="text" id="yeniStokKodu" placeholder="Örn: HC1.0100"></div>
+                    <div><label>Stok İsmi</label><input type="text" id="yeniStokIsmi" placeholder="Örn: 430 SB 0,5X3000X1500..."></div>
+                    <div><label>1 Plaka (kg)</label><input type="number" id="yeniStokPlaka" placeholder="Örn: 17.7746" step="0.0001"></div>
+                    <div><button class="btn btn-success" id="stokEkleBtn">➕ Stok Ekle</button></div>
+                </div>
+                <div id="stokEkleMesaj" style="margin-top:10px;"></div>
+            </div>
+            <div class="stok-duzenle-section">
+                <h3>📋 Mevcut Stoklar</h3>
+                <div class="stok-arama"><input type="text" id="stokArama" placeholder="🔍 Stok kodu veya isim ile ara..."></div>
+                <div id="stokListesi" style="max-height: 600px; overflow-y: auto;"></div>
+            </div>
+            <div style="margin-top:20px;"><button class="btn btn-secondary" id="stokDuzenleCikBtn">↩️ Ana Sayfaya Dön</button></div>
         </div>
     </div>
 </div>
@@ -315,8 +262,19 @@
     </div>
 </div>
 
+<div id="stokDuzenleModal" class="modal">
+    <div class="modal-content" style="max-width:600px;">
+        <span class="close-modal" onclick="kapatModal('stokDuzenleModal')">&times;</span>
+        <h2>✏️ Stok Düzenle</h2>
+        <div class="form-group"><label>Stok Kodu</label><input type="text" id="duzenleStokKodu" readonly style="background:#f0f0f0;"></div>
+        <div class="form-group"><label>Grup</label><select id="duzenleStokGrup"><option value="430">430</option><option value="DKP">DKP</option><option value="GALVANIZ">GALVANİZ</option><option value="304">304</option><option value="316">316</option><option value="201">201</option></select></div>
+        <div class="form-group"><label>Stok İsmi</label><input type="text" id="duzenleStokIsmi"></div>
+        <div class="form-group"><label>1 Plaka (kg)</label><input type="number" id="duzenleStokPlaka" step="0.0001"></div>
+        <div class="action-buttons"><button class="btn btn-success" id="stokGuncelleBtn">💾 Güncelle</button><button class="btn btn-secondary" onclick="kapatModal('stokDuzenleModal')">❌ İptal</button></div>
+    </div>
+</div>
+
 <script>
-// ==================== SAC4 FIREBASE YAPILANDIRMASI ====================
 const sac4FirebaseConfig = {
     apiKey: "AIzaSyAmlL-xVTWjahrz1VjXx-i86i0TuJ7HBdw",
     authDomain: "sac4-kesim.firebaseapp.com",
@@ -330,7 +288,6 @@ const sac4FirebaseConfig = {
 firebase.initializeApp(sac4FirebaseConfig);
 const database = firebase.database();
 
-// ==================== SİSTEM DEĞİŞKENLERİ ====================
 const SERI_NO = "SD";
 let aktifKullanici = null;
 let gecmisVeriler = [];
@@ -344,11 +301,13 @@ let filteredVeriler = [];
 let sortColumn = null;
 let sortDirection = 'asc';
 let detayEditingIdx = null;
+let duzenlenenStokKodu = null;
 
-const kullanicilar = { "SAC4": "4sac4" };
+const kullanicilar = { "SAC4": "4sac4", "Muhammed": "mhm2468", "Burak": "brk2468" };
+const adminKullanicilar = ["Muhammed", "Burak"];
+function isAdmin() { return adminKullanicilar.includes(aktifKullanici); }
 
 let stokBilgileri = {
-    // 430 Serisi
     "HC1.0001": "430 SB 0,5X3000X1500 PASLANMAZ SAC PLAKA",
     "HC1.0002": "430 SB 0,5X2500X1250 PASLANMAZ SAC PLAKA",
     "HC1.0003": "430 SB 0,5X2000X1000 PASLANMAZ SAC PLAKA",
@@ -360,8 +319,6 @@ let stokBilgileri = {
     "HC1.0009": "430 SB 1,5X3000X1500 PASLANMAZ SAC PLAKA",
     "HC1.0010": "430 SB 2,0X3000X1500 PASLANMAZ SAC PLAKA",
     "HC1.0011": "430 SB 3,0X3000X1500 PASLANMAZ SAC PLAKA",
-    
-    // DKP Serisi
     "HD1.0001": "DKP 0,8X1500X3000 MM SAC",
     "HD1.0002": "DKP 1,5X1250X2500 MM SAC",
     "HD1.0003": "DKP 2,0X1500X3000 MM SAC",
@@ -372,50 +329,36 @@ let stokBilgileri = {
     "HD1.0008": "DKP 8,0X1500X3000 MM SAC",
     "HD1.0009": "DKP 10,0X1500X3000 MM SAC",
     "HD1.0010": "DKP 12,0X1500X3000 MM SAC",
-    
-    // GALVANİZ Serisi
     "HG1.0001": "GALVANİZ SAC 0,5X2000X1000 PLAKA SAC",
     "HG1.0002": "GALVANİZ SAC 1,5X2000X1000 PLAKA SAC",
     "HG1.0003": "GALVANİZ SAC 2,0X2000X1000 PLAKA SAC",
-    
-    // 304 Serisi
     "HN1.0001": "304 2B 0,5x3000x1500 PASLANMAZ SAC",
     "HN1.0002": "304 2B 0,8x3000x1500 PASLANMAZ SAC",
     "HN1.0003": "304 2B 1,0x3000x1500 PASLANMAZ SAC",
     "HN1.0004": "304 2B 1,5x3000x1500 PASLANMAZ SAC",
     "HN1.0005": "304 2B 2,0x3000x1500 PASLANMAZ SAC",
     "HN1.0006": "304 2B 3,0x3000x1500 PASLANMAZ SAC",
-    
-    // 316 Serisi
     "HX1.0001": "316 SB 0,5X3000X1500 PASLANMAZ SAC PLAKA",
     "HX1.0002": "316 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA",
     "HX1.0003": "316 SB 1,0X3000X1500 PASLANMAZ SAC PLAKA",
     "HX1.0004": "316 SB 1,5X3000X1500 PASLANMAZ SAC PLAKA",
     "HX1.0005": "316 SB 2,0X3000X1500 PASLANMAZ SAC PLAKA",
-    
-    // 201 Serisi
     "HX1.0043": "201 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA",
     "HX1.0044": "201 SB 1,0X3000X1500 PASLANMAZ SAC PLAKA"
 };
 
 let plakaWeights = {
-    // 430
     "HC1.0001": 17.7746, "HC1.0002": 12.3447, "HC1.0003": 7.8500, "HC1.0004": 6.1300,
     "HC1.0005": 21.3300, "HC1.0006": 24.8850, "HC1.0007": 28.4400, "HC1.0008": 35.5500,
     "HC1.0009": 53.3250, "HC1.0010": 71.1000, "HC1.0011": 106.6500,
-    // DKP
     "HD1.0001": 28.0000, "HD1.0002": 37.0000, "HD1.0003": 71.1000, "HD1.0004": 106.6500,
     "HD1.0005": 142.2000, "HD1.0006": 177.7500, "HD1.0007": 213.3000, "HD1.0008": 284.4000,
     "HD1.0009": 355.5000, "HD1.0010": 426.6000,
-    // GALVANİZ
     "HG1.0001": 7.8500, "HG1.0002": 24.2925, "HG1.0003": 31.4000,
-    // 304
     "HN1.0001": 17.7750, "HN1.0002": 28.4417, "HN1.0003": 35.5500, "HN1.0004": 53.3250,
     "HN1.0005": 71.1000, "HN1.0006": 106.6500,
-    // 316
     "HX1.0001": 17.7750, "HX1.0002": 28.4400, "HX1.0003": 35.5500, "HX1.0004": 53.3250,
     "HX1.0005": 71.1000,
-    // 201
     "HX1.0043": 28.4400, "HX1.0044": 35.5500
 };
 
@@ -429,7 +372,7 @@ function stokGruplariniGuncelle() {
         else if (kod.startsWith("HD1")) stokGruplari[kod] = "DKP";
         else if (kod.startsWith("HG1")) stokGruplari[kod] = "GALVANIZ";
         else if (kod.startsWith("HN1")) stokGruplari[kod] = "304";
-        else if (kod === "HX1.0043") stokGruplari[kod] = "201";
+        else if (kod.startsWith("HX1.004")) stokGruplari[kod] = "201";
         else if (kod.startsWith("HX1")) stokGruplari[kod] = "316";
     });
 }
@@ -445,8 +388,7 @@ function urunleriGuncelle() {
     };
 }
 
-stokGruplariniGuncelle();
-urunleriGuncelle();
+stokGruplariniGuncelle(); urunleriGuncelle();
 
 function dotTemizle(kod) { return kod ? kod.replace(/_DOT_/g, '.') : ""; }
 function getStokIsmi(kod) { if(stokBilgileri[kod]) return stokBilgileri[kod]; let temiz = dotTemizle(kod); return stokBilgileri[temiz] || ""; }
@@ -460,11 +402,7 @@ function saveToFirebase() {
     let guvenliStok = {}; Object.keys(stokBilgileri).forEach(k => { guvenliStok[k.replace(/\./g, '_DOT_')] = stokBilgileri[k]; });
     let guvenliPlaka = {}; Object.keys(plakaWeights).forEach(k => { guvenliPlaka[k.replace(/\./g, '_DOT_')] = plakaWeights[k]; });
     let guvenliGrup = {}; Object.keys(stokGruplari).forEach(k => { guvenliGrup[k.replace(/\./g, '_DOT_')] = stokGruplari[k]; });
-    const data = {
-        gecmisVeriler, siraNo, silinenSiralar, aktarilanEvraklar,
-        stokBilgileri: guvenliStok, plakaWeights: guvenliPlaka, stokGruplari: guvenliGrup,
-        lastUpdated: firebase.database.ServerValue.TIMESTAMP
-    };
+    const data = { gecmisVeriler, siraNo, silinenSiralar, aktarilanEvraklar, stokBilgileri: guvenliStok, plakaWeights: guvenliPlaka, stokGruplari: guvenliGrup, lastUpdated: firebase.database.ServerValue.TIMESTAMP };
     return database.ref('sac4Kesim/').set(data);
 }
 
@@ -473,7 +411,7 @@ function loadFromFirebase() {
         const data = snapshot.val();
         if(data) {
             if(data.gecmisVeriler) gecmisVeriler = data.gecmisVeriler;
-            if(data.siraNo) siraNo = data.siraNo;
+            if(data.siraNo !== undefined) siraNo = data.siraNo;
             if(data.silinenSiralar) silinenSiralar = data.silinenSiralar;
             if(data.aktarilanEvraklar) aktarilanEvraklar = data.aktarilanEvraklar;
             if(data.stokBilgileri) { let ts = {}; Object.keys(data.stokBilgileri).forEach(k => { ts[k.replace(/_DOT_/g, '.')] = data.stokBilgileri[k]; }); stokBilgileri = ts; }
@@ -488,6 +426,7 @@ function loadFromFirebase() {
             document.getElementById("syncStatus").innerHTML = "✅ SAC4 Firebase Aktif (Yeni)";
             document.getElementById("syncStatus").className = "sync-status online";
         }
+        if(aktifKullanici) { rolBilgiGuncelle(); stokDuzenleButonKontrol(); excelButonlariniKontrol(); }
     }).catch(e => {
         console.error("Firebase okuma hatası:", e);
         document.getElementById("syncStatus").innerHTML = "⚠️ Bağlantı hatası";
@@ -501,7 +440,22 @@ function siranoArtir() { siraNo++; syncData(); }
 function getDurum(evrak) { let a = aktarilanEvraklar.includes(evrak["Sıra No"]); let d = evrak["Duzenlendi"] || false; if(a) return "Excel'e Aktarıldı"; if(d) return "Düzenlendi"; return "Bekliyor"; }
 function evrakAktarildiMi(evrak) { return aktarilanEvraklar.includes(evrak["Sıra No"]); }
 
-// ==================== LOGIN ====================
+function rolBilgiGuncelle() {
+    let badge = document.getElementById("userRolBadge");
+    let bilgi = document.getElementById("rolBilgiAlani");
+    if(isAdmin()) {
+        badge.innerHTML = '<span class="admin-badge">Admin</span>';
+        bilgi.innerHTML = '<div class="admin-note">👑 <strong>Admin Yetkisi:</strong> Tüm evrakları düzenleyebilir, silebilir ve Excel\'e aktarabilirsiniz. Stok düzenleme sayfasına erişebilirsiniz.</div>';
+    } else {
+        badge.innerHTML = '<span class="kullanici-badge">Kullanıcı</span>';
+        bilgi.innerHTML = '<div class="user-note">🔒 <strong>Kullanıcı Yetkisi:</strong> Sadece evrak oluşturabilir ve görüntüleyebilirsiniz. Düzenleme, silme ve Excel\'e aktarma işlemleri sadece Admin tarafından yapılabilir.</div>';
+    }
+}
+
+function stokDuzenleButonKontrol() { document.getElementById("stokDuzenleBtn").style.display = isAdmin() ? "inline-block" : "none"; }
+function excelButonlariniKontrol() { const div = document.getElementById("excelActionsDiv"); if(div) div.style.display = isAdmin() ? "flex" : "none"; }
+
+// LOGIN
 document.getElementById("loginBtn").onclick = function() {
     let u = document.getElementById("loginUsername").value.trim();
     let p = document.getElementById("loginPassword").value.trim();
@@ -511,11 +465,9 @@ document.getElementById("loginBtn").onclick = function() {
         document.getElementById("mainPage").style.display = "block";
         document.getElementById("currentUser").textContent = u;
         document.getElementById("loginError").style.display = "none";
-        anaSayfayaDon();
-        loadFromFirebase();
-    } else {
-        document.getElementById("loginError").style.display = "block";
-    }
+        rolBilgiGuncelle(); stokDuzenleButonKontrol(); excelButonlariniKontrol();
+        anaSayfayaDon(); loadFromFirebase();
+    } else { document.getElementById("loginError").style.display = "block"; }
 };
 
 document.getElementById("logoutBtn").onclick = function() {
@@ -531,6 +483,7 @@ document.getElementById("loginPassword").addEventListener("keypress", function(e
 function anaSayfayaDon() {
     document.getElementById("yeniGirisAlan").classList.remove("hidden");
     document.getElementById("oncekiGirislerAlan").classList.add("hidden");
+    document.getElementById("stokDuzenleAlan").classList.add("hidden");
     document.getElementById("stokGrubu").selectedIndex = 0;
     document.getElementById("urunSecim").style.display = "none";
     document.getElementById("tabloAlan").style.display = "none";
@@ -541,8 +494,17 @@ function anaSayfayaDon() {
 document.getElementById("yeniGirisBtn").onclick = anaSayfayaDon;
 document.getElementById("yeniKayitDonBtn").onclick = anaSayfayaDon;
 document.getElementById("oncekiGirislerBtn").onclick = gecmisListesiniGoster;
+document.getElementById("stokDuzenleBtn").onclick = function() { if(isAdmin()) stokDuzenleSayfasiniAc(); };
+document.getElementById("stokDuzenleCikBtn").onclick = anaSayfayaDon;
 
-// ==================== STOK GRUBU ====================
+function stokDuzenleSayfasiniAc() {
+    document.getElementById("yeniGirisAlan").classList.add("hidden");
+    document.getElementById("oncekiGirislerAlan").classList.add("hidden");
+    document.getElementById("stokDuzenleAlan").classList.remove("hidden");
+    stokListesiniGoster();
+}
+
+// STOK GRUBU
 document.getElementById("stokGrubu").onchange = function() {
     let g = this.value;
     let us = document.getElementById("urunKodu");
@@ -555,7 +517,7 @@ document.getElementById("stokGrubu").onchange = function() {
     ta.style.display = "none"; ta.innerHTML = "";
 };
 
-// ==================== ÜRÜN SEÇİNCE TABLO ====================
+// ÜRÜN SEÇİNCE TABLO
 document.getElementById("urunKodu").onchange = function() {
     let sec = Array.from(this.selectedOptions).map(o => o.value);
     let ta = document.getElementById("tabloAlan");
@@ -579,7 +541,7 @@ document.getElementById("urunKodu").onchange = function() {
     });
 };
 
-// ==================== KAYDET ====================
+// KAYDET
 function kaydetVeGecmiseGit(yonlendir) {
     let satirlar = document.querySelectorAll("#tabloAlan tbody tr");
     if(satirlar.length === 0) { document.getElementById("mesaj").innerHTML = "<span class='error'>Lütfen en az bir ürün seçin!</span>"; return false; }
@@ -608,12 +570,14 @@ function kaydetVeGecmiseGit(yonlendir) {
 document.getElementById("kaydetBtn").onclick = () => kaydetVeGecmiseGit(false);
 document.getElementById("kayitSonrasiGecmisBtn").onclick = () => kaydetVeGecmiseGit(true);
 
-// ==================== ÖNCEKİ GİRİŞLER ====================
+// ÖNCEKİ GİRİŞLER
 function gecmisListesiniGoster() {
     document.getElementById("yeniGirisAlan").classList.add("hidden");
     document.getElementById("oncekiGirislerAlan").classList.remove("hidden");
+    document.getElementById("stokDuzenleAlan").classList.add("hidden");
     gecmisVeriler = gecmisVeriler.filter(e => !silinenSiralar.includes(e["Sıra No"]));
-    filteredVeriler = [...gecmisVeriler]; currentPage = 1; seciliEvrakIndisleri.clear(); gecmisYukle();
+    filteredVeriler = [...gecmisVeriler]; currentPage = 1; seciliEvrakIndisleri.clear();
+    excelButonlariniKontrol(); gecmisYukle();
 }
 
 function filtreUygula() {
@@ -630,65 +594,39 @@ function filtreUygula() {
     });
 }
 
-function sortTable(col) {
-    if(sortColumn === col) sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-    else { sortColumn = col; sortDirection = 'asc'; }
-    currentPage = 1; gecmisYukle();
-}
+function sortTable(col) { if(sortColumn === col) sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'; else { sortColumn = col; sortDirection = 'asc'; } currentPage = 1; gecmisYukle(); }
 window.sortTable = sortTable;
-
 function getSortArrow(col) { if(sortColumn === col) return sortDirection === 'asc' ? ' ▲' : ' ▼'; return ' ⇅'; }
 
 function gecmisYukle() {
     let c = document.getElementById("gecmisTablosu"); let ks = document.getElementById("kayitSayisi");
     if(gecmisVeriler.length === 0) { c.innerHTML = "<p style='padding:30px;text-align:center;color:#999;'>Henüz SAC4 kaydı bulunmuyor.</p>"; ks.textContent = "Toplam: 0 evrak"; document.getElementById("paginationContainer").innerHTML = ""; document.getElementById("seciliSayi").textContent = "0"; return; }
     filtreUygula();
-    if(sortColumn) {
-        filteredVeriler.sort((a, b) => {
-            let va, vb;
-            switch(sortColumn) {
-                case 'seri': va = a["Seri No"] || ""; vb = b["Seri No"] || ""; break;
-                case 'sira': va = a["Sıra No"] || 0; vb = b["Sıra No"] || 0; break;
-                case 'grup': va = a["Grup"] || ""; vb = b["Grup"] || ""; break;
-                case 'tarih': va = a["Kayıt Tarihi"] || ""; vb = b["Kayıt Tarihi"] || ""; break;
-                default: return 0;
-            }
-            if(va < vb) return sortDirection === 'asc' ? -1 : 1;
-            if(va > vb) return sortDirection === 'asc' ? 1 : -1;
-            return 0;
-        });
-    }
+    if(sortColumn) { filteredVeriler.sort((a, b) => { let va, vb; switch(sortColumn) { case 'seri': va = a["Seri No"] || ""; vb = b["Seri No"] || ""; break; case 'sira': va = a["Sıra No"] || 0; vb = b["Sıra No"] || 0; break; case 'grup': va = a["Grup"] || ""; vb = b["Grup"] || ""; break; case 'tarih': va = a["Kayıt Tarihi"] || ""; vb = b["Kayıt Tarihi"] || ""; break; default: return 0; } if(va < vb) return sortDirection === 'asc' ? -1 : 1; if(va > vb) return sortDirection === 'asc' ? 1 : -1; return 0; }); }
     ks.textContent = "SAC4 Evrakları: " + filteredVeriler.length;
-    let tp = Math.ceil(filteredVeriler.length / pageSize);
-    if(currentPage > tp && tp > 0) currentPage = tp;
-    if(currentPage < 1) currentPage = 1;
+    let tp = Math.ceil(filteredVeriler.length / pageSize); if(currentPage > tp && tp > 0) currentPage = tp; if(currentPage < 1) currentPage = 1;
     let pd = filteredVeriler.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-    let h = '<table><thead><tr><th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>';
+    let adminYetki = isAdmin();
+    let h = '<table><thead><tr>';
+    if(adminYetki) h += '<th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>';
     h += '<th class="sortable" onclick="sortTable(\'seri\')">Seri No' + getSortArrow('seri') + '</th>';
     h += '<th class="sortable" onclick="sortTable(\'sira\')">Sıra No' + getSortArrow('sira') + '</th>';
     h += '<th class="sortable" onclick="sortTable(\'grup\')">Grup' + getSortArrow('grup') + '</th>';
     h += '<th>Oluşturan</th><th class="sortable" onclick="sortTable(\'tarih\')">Kayıt Tarihi' + getSortArrow('tarih') + '</th>';
     h += '<th>Kayıt Saati</th><th>İşlem</th></tr></thead><tbody>';
-    pd.forEach(r => {
-        let gi = gecmisVeriler.indexOf(r); let ch = seciliEvrakIndisleri.has(gi) ? 'checked' : ''; let kl = evrakAktarildiMi(r);
-        h += '<tr class="' + (kl ? 'kilitli' : '') + '"><td><input type="checkbox" class="evrak-checkbox" data-idx="' + gi + '" ' + ch + '></td>';
+    pd.forEach(r => { let gi = gecmisVeriler.indexOf(r); let ch = seciliEvrakIndisleri.has(gi) ? 'checked' : ''; let kl = evrakAktarildiMi(r);
+        h += '<tr class="' + (kl ? 'kilitli' : '') + '">';
+        if(adminYetki) h += '<td><input type="checkbox" class="evrak-checkbox" data-idx="' + gi + '" ' + ch + '></td>';
         h += '<td>' + r["Seri No"] + '</td><td>' + r["Sıra No"] + '</td><td>' + r["Grup"] + '</td><td>' + (r["Olusturan"] || "") + '</td>';
         h += '<td>' + (r["Kayıt Tarihi"] || "") + '</td><td>' + (r["Kayıt Saati"] || "") + '</td>';
-        h += '<td><button class="btn btn-info btn-sm" onclick="detayGoster(' + gi + ')">📄 Detay</button> <button class="btn btn-danger btn-sm" onclick="evrakSil(' + gi + ')">🗑️</button></td></tr>';
-    });
+        h += '<td><button class="btn btn-info btn-sm" onclick="detayGoster(' + gi + ')">📄 Detay</button> ';
+        if(adminYetki) h += '<button class="btn btn-danger btn-sm" onclick="evrakSil(' + gi + ')">🗑️</button>';
+        h += '</td></tr>'; });
     h += '</tbody></table>'; c.innerHTML = h;
-    document.querySelectorAll('.evrak-checkbox').forEach(cb => { cb.onchange = function() { let ix = parseInt(this.dataset.idx); if(this.checked) seciliEvrakIndisleri.add(ix); else seciliEvrakIndisleri.delete(ix); document.getElementById("seciliSayi").textContent = seciliEvrakIndisleri.size; }; });
-    let sac = document.getElementById("selectAllCheckbox");
-    if(sac) sac.onchange = function() { document.querySelectorAll('.evrak-checkbox').forEach(cb => { cb.checked = this.checked; if(this.checked) seciliEvrakIndisleri.add(parseInt(cb.dataset.idx)); else seciliEvrakIndisleri.delete(parseInt(cb.dataset.idx)); }); document.getElementById("seciliSayi").textContent = seciliEvrakIndisleri.size; };
+    if(adminYetki) { document.querySelectorAll('.evrak-checkbox').forEach(cb => { cb.onchange = function() { let ix = parseInt(this.dataset.idx); if(this.checked) seciliEvrakIndisleri.add(ix); else seciliEvrakIndisleri.delete(ix); document.getElementById("seciliSayi").textContent = seciliEvrakIndisleri.size; }; });
+        let sac = document.getElementById("selectAllCheckbox"); if(sac) sac.onchange = function() { document.querySelectorAll('.evrak-checkbox').forEach(cb => { cb.checked = this.checked; if(this.checked) seciliEvrakIndisleri.add(parseInt(cb.dataset.idx)); else seciliEvrakIndisleri.delete(parseInt(cb.dataset.idx)); }); document.getElementById("seciliSayi").textContent = seciliEvrakIndisleri.size; }; }
     document.getElementById("seciliSayi").textContent = seciliEvrakIndisleri.size;
-    let ph = "";
-    if(tp > 1) {
-        ph += '<button onclick="sayfaDegistir(1)" ' + (currentPage === 1 ? 'disabled' : '') + '>⏮</button>';
-        ph += '<button onclick="sayfaDegistir(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + '>◀</button>';
-        ph += '<span style="padding:6px 12px;">Sayfa ' + currentPage + '/' + tp + '</span>';
-        ph += '<button onclick="sayfaDegistir(' + (currentPage + 1) + ')" ' + (currentPage === tp ? 'disabled' : '') + '>▶</button>';
-        ph += '<button onclick="sayfaDegistir(' + tp + ')" ' + (currentPage === tp ? 'disabled' : '') + '>⏭</button>';
-    }
+    let ph = ""; if(tp > 1) { ph += '<button onclick="sayfaDegistir(1)" ' + (currentPage === 1 ? 'disabled' : '') + '>⏮</button>'; ph += '<button onclick="sayfaDegistir(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + '>◀</button>'; ph += '<span style="padding:6px 12px;">Sayfa ' + currentPage + '/' + tp + '</span>'; ph += '<button onclick="sayfaDegistir(' + (currentPage + 1) + ')" ' + (currentPage === tp ? 'disabled' : '') + '>▶</button>'; ph += '<button onclick="sayfaDegistir(' + tp + ')" ' + (currentPage === tp ? 'disabled' : '') + '>⏭</button>'; }
     document.getElementById("paginationContainer").innerHTML = ph;
 }
 window.sayfaDegistir = function(p) { currentPage = p; gecmisYukle(); };
@@ -696,31 +634,18 @@ window.sayfaDegistir = function(p) { currentPage = p; gecmisYukle(); };
 document.getElementById("filtreUygulaBtn").onclick = () => { currentPage = 1; seciliEvrakIndisleri.clear(); gecmisYukle(); };
 document.getElementById("filtreTemizleBtn").onclick = () => { document.getElementById("filtre_seri").value = ""; document.getElementById("filtre_sira").value = ""; document.getElementById("filtre_grup").value = ""; document.getElementById("filtre_tarih").value = ""; currentPage = 1; seciliEvrakIndisleri.clear(); gecmisYukle(); };
 
-// ==================== EXCEL ====================
-document.getElementById("seciliExceleAktarBtn").onclick = function() {
-    if(seciliEvrakIndisleri.size === 0) { alert("Lütfen evrak seçin!"); return; }
-    let secilen = []; seciliEvrakIndisleri.forEach(ix => { if(gecmisVeriler[ix]) secilen.push(gecmisVeriler[ix]); });
-    if(secilen.length === 0) { alert("Seçili evrak yok!"); return; }
-    secilen.forEach(e => { if(!aktarilanEvraklar.includes(e["Sıra No"])) aktarilanEvraklar.push(e["Sıra No"]); });
-    syncData();
-    let excelHtml = '<html><head><meta charset="UTF-8"><style>th{background:#2c3e50;color:white;padding:8px}td{padding:8px;border:1px solid black}</style></head><body><table border="1"><tr><th>Seri No</th><th>Sıra No</th><th>Grup</th><th>Oluşturan</th><th>Kayıt Tarihi</th><th>Kayıt Saati</th><th>Stok Kodu</th><th>Stok İsmi</th><th>Miktar</th><th>1 Plaka</th><th>Toplam Kg</th><th>Açıklama</th></tr>';
-    secilen.forEach(e => { (e.Kalemler || []).forEach(k => { excelHtml += '<tr><td>' + e["Seri No"] + '</td><td>' + e["Sıra No"] + '</td><td>' + e["Grup"] + '</td><td>' + (e["Olusturan"] || "") + '</td><td>' + (e["Kayıt Tarihi"] || "") + '</td><td>' + (e["Kayıt Saati"] || "") + '</td><td>' + dotTemizle(k["Stok Kodu"] || "") + '</td><td>' + (k["Stok İsmi"] || "") + '</td><td>' + formatNumberDisplay(k["Miktar"]) + '</td><td>' + formatNumberDisplay(k["1 Plaka (kg)"]) + '</td><td>' + formatNumberDisplay(k["Toplam Kg"]) + '</td><td>' + (k["Açıklama"] || "") + '</td></tr>'; }); });
-    excelHtml += '</table></body></html>';
-    let blob = new Blob([excelHtml], {type: 'application/vnd.ms-excel;charset=utf-8'});
-    let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "SAC4_kesim_" + new Date().toISOString().slice(0,10) + ".xls"; link.click(); URL.revokeObjectURL(link.href);
-    filteredVeriler = [...gecmisVeriler]; gecmisYukle(); alert(secilen.length + " evrak Excel'e aktarıldı! ✅");
-};
+// EXCEL (SADECE ADMIN)
+document.getElementById("seciliExceleAktarBtn").onclick = function() { if(!isAdmin()) { alert("Bu işlem sadece Admin tarafından yapılabilir!"); return; } if(seciliEvrakIndisleri.size === 0) { alert("Lütfen evrak seçin!"); return; } let secilen = []; seciliEvrakIndisleri.forEach(ix => { if(gecmisVeriler[ix]) secilen.push(gecmisVeriler[ix]); }); secilen.forEach(e => { if(!aktarilanEvraklar.includes(e["Sıra No"])) aktarilanEvraklar.push(e["Sıra No"]); }); syncData(); let excelHtml = '<html><head><meta charset="UTF-8"><style>th{background:#2c3e50;color:white;padding:8px}td{padding:8px;border:1px solid black}</style></head><body><table border="1"><tr><th>Seri No</th><th>Sıra No</th><th>Grup</th><th>Oluşturan</th><th>Kayıt Tarihi</th><th>Kayıt Saati</th><th>Stok Kodu</th><th>Stok İsmi</th><th>Miktar</th><th>1 Plaka</th><th>Toplam Kg</th><th>Açıklama</th></tr>'; secilen.forEach(e => { (e.Kalemler || []).forEach(k => { excelHtml += '<tr><td>' + e["Seri No"] + '</td><td>' + e["Sıra No"] + '</td><td>' + e["Grup"] + '</td><td>' + (e["Olusturan"] || "") + '</td><td>' + (e["Kayıt Tarihi"] || "") + '</td><td>' + (e["Kayıt Saati"] || "") + '</td><td>' + dotTemizle(k["Stok Kodu"] || "") + '</td><td>' + (k["Stok İsmi"] || "") + '</td><td>' + formatNumberDisplay(k["Miktar"]) + '</td><td>' + formatNumberDisplay(k["1 Plaka (kg)"]) + '</td><td>' + formatNumberDisplay(k["Toplam Kg"]) + '</td><td>' + (k["Açıklama"] || "") + '</td></tr>'; }); }); excelHtml += '</table></body></html>'; let blob = new Blob([excelHtml], {type: 'application/vnd.ms-excel;charset=utf-8'}); let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "SAC4_kesim_" + new Date().toISOString().slice(0,10) + ".xls"; link.click(); URL.revokeObjectURL(link.href); filteredVeriler = [...gecmisVeriler]; gecmisYukle(); alert(secilen.length + " evrak Excel'e aktarıldı! ✅"); };
+document.getElementById("tumunuSecBtn").onclick = function() { if(!isAdmin()) return; document.querySelectorAll('.evrak-checkbox').forEach(cb => { cb.checked = true; seciliEvrakIndisleri.add(parseInt(cb.dataset.idx)); }); document.getElementById("seciliSayi").textContent = seciliEvrakIndisleri.size; };
+document.getElementById("secimiTemizleBtn").onclick = function() { if(!isAdmin()) return; document.querySelectorAll('.evrak-checkbox').forEach(cb => { cb.checked = false; seciliEvrakIndisleri.delete(parseInt(cb.dataset.idx)); }); document.getElementById("seciliSayi").textContent = "0"; };
 
-document.getElementById("tumunuSecBtn").onclick = function() { document.querySelectorAll('.evrak-checkbox').forEach(cb => { cb.checked = true; seciliEvrakIndisleri.add(parseInt(cb.dataset.idx)); }); document.getElementById("seciliSayi").textContent = seciliEvrakIndisleri.size; };
-document.getElementById("secimiTemizleBtn").onclick = function() { document.querySelectorAll('.evrak-checkbox').forEach(cb => { cb.checked = false; seciliEvrakIndisleri.delete(parseInt(cb.dataset.idx)); }); document.getElementById("seciliSayi").textContent = "0"; };
-
-// ==================== DETAY MODAL ====================
+// DETAY MODAL
 function stokSecenekleriniOlustur(grup, secili) { let o = '<option value="">-- Stok Seçin --</option>'; let sl = grup === "HRD" ? tumStoklariGetir() : (urunler[grup] || []); sl.forEach(s => { o += '<option value="' + s + '" ' + (s === secili ? 'selected' : '') + '>' + dotTemizle(s) + ' - ' + getStokIsmi(s) + '</option>'; }); return o; }
 
 window.detayGoster = function(idx) {
     let r = gecmisVeriler[idx]; if(!r) return; detayEditingIdx = idx;
-    let kl = evrakAktarildiMi(r);
-    document.getElementById("detayKilitBilgi").innerHTML = kl ? '<div class="kilitli-bilgi"><span>🔒</span> Bu evrak Excel\'e aktarıldığı için kilitlidir.</div>' : '';
+    let kl = evrakAktarildiMi(r); let adminYetki = isAdmin();
+    document.getElementById("detayKilitBilgi").innerHTML = (!adminYetki) ? '<div class="kilitli-bilgi"><span>🔒</span> Düzenleme ve silme işlemleri sadece Admin tarafından yapılabilir.</div>' : (kl ? '<div class="kilitli-bilgi"><span>🔒</span> Bu evrak Excel\'e aktarılmıştır.</div>' : '');
     let ic = '<div class="detay-row"><span class="detay-label">Seri No:</span><span class="detay-value">' + r["Seri No"] + '</span></div>';
     ic += '<div class="detay-row"><span class="detay-label">Sıra No:</span><span class="detay-value">' + r["Sıra No"] + '</span></div>';
     ic += '<div class="detay-row"><span class="detay-label">Grup:</span><span class="detay-value">' + r["Grup"] + '</span></div>';
@@ -733,59 +658,43 @@ window.detayGoster = function(idx) {
     ic += '</tbody></table>';
     document.getElementById("detayIcerik").innerHTML = ic;
     document.getElementById("detayDuzenlemeAlani").style.display = "none";
-    document.getElementById("detayDuzenleBtn").disabled = kl; document.getElementById("detaySilBtn").disabled = kl;
-    document.getElementById("detayDuzenleBtn").classList.remove("hidden"); document.getElementById("detayKaydetBtn").classList.add("hidden");
+    document.getElementById("detayDuzenleBtn").disabled = !adminYetki || kl;
+    document.getElementById("detaySilBtn").disabled = !adminYetki || kl;
+    document.getElementById("detayDuzenleBtn").classList.remove("hidden");
+    document.getElementById("detayKaydetBtn").classList.add("hidden");
     document.getElementById("detayModal").style.display = "block";
 };
 
-document.getElementById("detayDuzenleBtn").onclick = function() { let r = gecmisVeriler[detayEditingIdx]; if(!r || evrakAktarildiMi(r)) { alert("Düzenleme yetkiniz yok!"); return; } duzenlemeModunuAc(); };
+document.getElementById("detayDuzenleBtn").onclick = function() { if(!isAdmin()) { alert("Bu işlem sadece Admin tarafından yapılabilir!"); return; } let r = gecmisVeriler[detayEditingIdx]; if(!r || evrakAktarildiMi(r)) { alert("Düzenleme yetkiniz yok!"); return; } duzenlemeModunuAc(); };
 
-function duzenlemeModunuAc() {
-    let r = gecmisVeriler[detayEditingIdx];
-    let gs = '<select id="editGrup" onchange="grupDegisinceStoklariGuncelle()">';
-    ["430","DKP","GALVANIZ","304","316","201","HRD"].forEach(g => { gs += '<option value="' + g + '" ' + (r["Grup"] === g ? 'selected' : '') + '>' + g + '</option>'; });
-    gs += '</select>';
-    let h = '<div class="detay-edit-section"><h3>✏️ Evrak Düzenleme</h3><div class="form-group"><label>Grup:</label>' + gs + '</div>';
-    h += '<div class="form-group"><label>Kalemler:</label><table class="edit-table"><thead><tr><th>Stok Kodu</th><th>Stok İsmi</th><th>Miktar</th><th>1 Plaka</th><th>Toplam Kg</th><th>Açıklama</th><th>İşlem</th></tr></thead><tbody id="editKalemlerTbody">';
-    (r.Kalemler || []).forEach(k => {
-        h += '<tr class="edit-kalem-row"><td><select class="stok-select kalem-stok-select" onchange="stokSecincePlakaGuncelle(this)">' + stokSecenekleriniOlustur(r["Grup"], k["Stok Kodu"]) + '</select></td>';
-        h += '<td class="stok-isim">' + getStokIsmi(k["Stok Kodu"]) + '</td>';
-        h += '<td><input type="number" class="miktar-input edit-miktar" value="' + formatNumberDisplay(k["Miktar"]) + '" step="0.01" oninput="miktarDegisinceToplamGuncelle(this)"></td>';
-        h += '<td><input type="text" class="plaka-display edit-plaka" value="' + formatNumberDisplay(k["1 Plaka (kg)"]) + '" readonly></td>';
-        h += '<td><input type="text" class="toplam-display edit-toplam" value="' + formatNumberDisplay(k["Toplam Kg"]) + '" readonly></td>';
-        h += '<td><input type="text" class="edit-aciklama" value="' + (k["Açıklama"] || "") + '"></td>';
-        h += '<td><button class="kalem-sil-btn" onclick="this.closest(\'tr\').remove()">🗑️</button></td></tr>';
-    });
-    h += '</tbody></table><button class="kalem-ekle-btn" onclick="yeniKalemEkle()">➕ Yeni Kalem</button></div></div>';
-    document.getElementById("detayDuzenlemeAlani").innerHTML = h;
-    document.getElementById("detayDuzenlemeAlani").style.display = "block";
-    document.getElementById("detayDuzenleBtn").classList.add("hidden"); document.getElementById("detayKaydetBtn").classList.remove("hidden");
-}
-
+function duzenlemeModunuAc() { let r = gecmisVeriler[detayEditingIdx]; let gs = '<select id="editGrup" onchange="grupDegisinceStoklariGuncelle()">'; ["430","DKP","GALVANIZ","304","316","201","HRD"].forEach(g => { gs += '<option value="' + g + '" ' + (r["Grup"] === g ? 'selected' : '') + '>' + g + '</option>'; }); gs += '</select>'; let h = '<div class="detay-edit-section"><h3>✏️ Evrak Düzenleme</h3><div class="form-group"><label>Grup:</label>' + gs + '</div>'; h += '<div class="form-group"><label>Kalemler:</label><table class="edit-table"><thead><tr><th>Stok Kodu</th><th>Stok İsmi</th><th>Miktar</th><th>1 Plaka</th><th>Toplam Kg</th><th>Açıklama</th><th>İşlem</th></tr></thead><tbody id="editKalemlerTbody">'; (r.Kalemler || []).forEach(k => { h += '<tr class="edit-kalem-row"><td><select class="stok-select kalem-stok-select" onchange="stokSecincePlakaGuncelle(this)">' + stokSecenekleriniOlustur(r["Grup"], k["Stok Kodu"]) + '</select></td>'; h += '<td class="stok-isim">' + getStokIsmi(k["Stok Kodu"]) + '</td>'; h += '<td><input type="number" class="miktar-input edit-miktar" value="' + formatNumberDisplay(k["Miktar"]) + '" step="0.01" oninput="miktarDegisinceToplamGuncelle(this)"></td>'; h += '<td><input type="text" class="plaka-display edit-plaka" value="' + formatNumberDisplay(k["1 Plaka (kg)"]) + '" readonly></td>'; h += '<td><input type="text" class="toplam-display edit-toplam" value="' + formatNumberDisplay(k["Toplam Kg"]) + '" readonly></td>'; h += '<td><input type="text" class="edit-aciklama" value="' + (k["Açıklama"] || "") + '"></td>'; h += '<td><button class="kalem-sil-btn" onclick="this.closest(\'tr\').remove()">🗑️</button></td></tr>'; }); h += '</tbody></table><button class="kalem-ekle-btn" onclick="yeniKalemEkle()">➕ Yeni Kalem</button></div></div>'; document.getElementById("detayDuzenlemeAlani").innerHTML = h; document.getElementById("detayDuzenlemeAlani").style.display = "block"; document.getElementById("detayDuzenleBtn").classList.add("hidden"); document.getElementById("detayKaydetBtn").classList.remove("hidden"); }
 window.grupDegisinceStoklariGuncelle = function() { let yg = document.getElementById("editGrup") ? document.getElementById("editGrup").value : ""; if(!yg) return; document.querySelectorAll('.kalem-stok-select').forEach(s => { let md = s.value; s.innerHTML = stokSecenekleriniOlustur(yg, md); }); };
 window.stokSecincePlakaGuncelle = function(se) { let sk = se.value; let r = se.closest('tr'); let p = getPlakaWeight(sk); r.querySelector('.edit-plaka').value = formatNumberDisplay(p); r.querySelector('.stok-isim').textContent = getStokIsmi(sk); let m = parseNumber(r.querySelector('.edit-miktar').value); r.querySelector('.edit-toplam').value = formatNumberDisplay(m * p); };
 window.miktarDegisinceToplamGuncelle = function(ie) { let r = ie.closest('tr'); let m = parseNumber(ie.value); let p = parseNumber(r.querySelector('.edit-plaka').value); r.querySelector('.edit-toplam').value = formatNumberDisplay(m * p); };
 window.yeniKalemEkle = function() { let tb = document.getElementById("editKalemlerTbody"); let sg = document.getElementById("editGrup") ? document.getElementById("editGrup").value : "430"; let r = document.createElement("tr"); r.className = "edit-kalem-row"; r.innerHTML = '<td><select class="stok-select kalem-stok-select" onchange="stokSecincePlakaGuncelle(this)">' + stokSecenekleriniOlustur(sg) + '</select></td><td class="stok-isim"></td><td><input type="number" class="miktar-input edit-miktar" value="0" step="0.01" oninput="miktarDegisinceToplamGuncelle(this)"></td><td><input type="text" class="plaka-display edit-plaka" value="0" readonly></td><td><input type="text" class="toplam-display edit-toplam" value="0" readonly></td><td><input type="text" class="edit-aciklama" value=""></td><td><button class="kalem-sil-btn" onclick="this.closest(\'tr\').remove()">🗑️</button></td>'; tb.appendChild(r); };
 
-document.getElementById("detayKaydetBtn").onclick = function() {
-    let r = gecmisVeriler[detayEditingIdx]; if(!r || evrakAktarildiMi(r)) { alert("Düzenleme yetkiniz yok!"); return; }
-    let yg = document.getElementById("editGrup").value; let yk = [];
-    document.querySelectorAll("#editKalemlerTbody .edit-kalem-row").forEach(row => { let sk = row.querySelector('.kalem-stok-select').value; if(sk) { yk.push({"Stok Kodu": sk, "Stok İsmi": getStokIsmi(sk), "Miktar": formatNumber(row.querySelector('.edit-miktar').value), "1 Plaka (kg)": formatNumber(row.querySelector('.edit-plaka').value), "Toplam Kg": formatNumber(row.querySelector('.edit-toplam').value), "Açıklama": row.querySelector('.edit-aciklama').value}); } });
-    if(yk.length === 0) { alert("En az bir kalem olmalı!"); return; }
-    r["Grup"] = yg; r["Kalemler"] = yk; r["Duzenlendi"] = true; r["Duzenleyen"] = aktifKullanici; r["DuzenlemeTarihi"] = new Date().toLocaleString('tr-TR');
-    saveToFirebase().then(() => { console.log("✅ SAC4 - Düzenleme Firebase'e kaydedildi!"); alert("✅ Değişiklikler kaydedildi!"); document.getElementById("detayModal").style.display = "none"; gecmisYukle(); }).catch(err => { console.error("❌ SAC4 - Düzenleme kayıt hatası:", err); alert("❌ Kayıt hatası!"); });
-};
+document.getElementById("detayKaydetBtn").onclick = function() { if(!isAdmin()) { alert("Bu işlem sadece Admin tarafından yapılabilir!"); return; } let r = gecmisVeriler[detayEditingIdx]; if(!r || evrakAktarildiMi(r)) { alert("Düzenleme yetkiniz yok!"); return; } let yg = document.getElementById("editGrup").value; let yk = []; document.querySelectorAll("#editKalemlerTbody .edit-kalem-row").forEach(row => { let sk = row.querySelector('.kalem-stok-select').value; if(sk) { yk.push({"Stok Kodu": sk, "Stok İsmi": getStokIsmi(sk), "Miktar": formatNumber(row.querySelector('.edit-miktar').value), "1 Plaka (kg)": formatNumber(row.querySelector('.edit-plaka').value), "Toplam Kg": formatNumber(row.querySelector('.edit-toplam').value), "Açıklama": row.querySelector('.edit-aciklama').value}); } }); if(yk.length === 0) { alert("En az bir kalem olmalı!"); return; } r["Grup"] = yg; r["Kalemler"] = yk; r["Duzenlendi"] = true; r["Duzenleyen"] = aktifKullanici; r["DuzenlemeTarihi"] = new Date().toLocaleString('tr-TR'); saveToFirebase().then(() => { console.log("✅ SAC4 - Düzenleme Firebase'e kaydedildi!"); alert("✅ Değişiklikler kaydedildi!"); document.getElementById("detayModal").style.display = "none"; gecmisYukle(); }).catch(err => { console.error("❌ SAC4 - Düzenleme kayıt hatası:", err); alert("❌ Kayıt hatası!"); }); };
 
-document.getElementById("detaySilBtn").onclick = function() { let r = gecmisVeriler[detayEditingIdx]; if(!r || evrakAktarildiMi(r)) { alert("Silme yetkiniz yok!"); return; } document.getElementById("detayModal").style.display = "none"; if(confirm("Bu evrak silinsin mi?")) evrakSilOnaylandi(detayEditingIdx); };
-window.evrakSil = function(idx) { let r = gecmisVeriler[idx]; if(!r || evrakAktarildiMi(r)) { alert("Bu evrak Excel'e aktarıldığı için silinemez!"); return; } if(confirm("Bu evrak silinsin mi?")) evrakSilOnaylandi(idx); };
+document.getElementById("detaySilBtn").onclick = function() { if(!isAdmin()) { alert("Bu işlem sadece Admin tarafından yapılabilir!"); return; } let r = gecmisVeriler[detayEditingIdx]; if(!r || evrakAktarildiMi(r)) { alert("Silme yetkiniz yok!"); return; } document.getElementById("detayModal").style.display = "none"; if(confirm("Bu evrak silinsin mi?")) evrakSilOnaylandi(detayEditingIdx); };
+window.evrakSil = function(idx) { if(!isAdmin()) { alert("Bu işlem sadece Admin tarafından yapılabilir!"); return; } let r = gecmisVeriler[idx]; if(!r || evrakAktarildiMi(r)) { alert("Bu evrak silinemez!"); return; } if(confirm("Bu evrak silinsin mi?")) evrakSilOnaylandi(idx); };
 function evrakSilOnaylandi(idx) { let ss = gecmisVeriler[idx]["Sıra No"]; gecmisVeriler.splice(idx, 1); if(!silinenSiralar.includes(ss)) silinenSiralar.push(ss); aktarilanEvraklar = aktarilanEvraklar.filter(s => s !== ss); saveToFirebase().then(() => console.log("✅ SAC4 - Silme Firebase'e kaydedildi!")).catch(err => console.error("❌ SAC4 - Silme kaydedilemedi:", err)); seciliEvrakIndisleri.clear(); gecmisYukle(); }
+
+// STOK DÜZENLEME (SADECE ADMIN)
+document.getElementById("stokEkleBtn").onclick = function() { if(!isAdmin()) { alert("Bu işlem sadece Admin tarafından yapılabilir!"); return; } let g = document.getElementById("yeniStokGrup").value; let k = document.getElementById("yeniStokKodu").value.trim(); let i = document.getElementById("yeniStokIsmi").value.trim(); let ps = document.getElementById("yeniStokPlaka").value.trim(); if(!k || !i || !ps) { document.getElementById("stokEkleMesaj").innerHTML = "<span class='error'>Tüm alanları doldurun!</span>"; return; } if(stokBilgileri[k]) { document.getElementById("stokEkleMesaj").innerHTML = "<span class='error'>Bu stok kodu zaten mevcut!</span>"; return; } let p = parseNumber(ps); if(p <= 0) { document.getElementById("stokEkleMesaj").innerHTML = "<span class='error'>Geçerli plaka kilosu girin!</span>"; return; } stokBilgileri[k] = i; plakaWeights[k] = p; stokGruplari[k] = g; urunleriGuncelle(); syncData(); document.getElementById("yeniStokKodu").value = ""; document.getElementById("yeniStokIsmi").value = ""; document.getElementById("yeniStokPlaka").value = ""; document.getElementById("stokEkleMesaj").innerHTML = "<span class='success'>✅ Stok eklendi!</span>"; stokListesiniGoster(); };
+document.getElementById("stokArama").oninput = function() { stokListesiniGoster(this.value); };
+
+function stokListesiniGoster(arama) { let c = document.getElementById("stokListesi"); let tk = Object.keys(stokBilgileri).sort(); if(arama) { let ak = arama.toLowerCase(); tk = tk.filter(k => k.toLowerCase().includes(ak) || (stokBilgileri[k] || "").toLowerCase().includes(ak)); } if(tk.length === 0) { c.innerHTML = "<p style='padding:20px;text-align:center;color:#999;'>Stok bulunamadı.</p>"; return; } let h = ''; tk.forEach(k => { h += '<div class="stok-card"><span><strong>' + dotTemizle(k) + '</strong></span><span style="color:#666;font-size:13px;">' + stokBilgileri[k] + '</span><span style="color:#2980b9;font-weight:600;">' + formatNumberDisplay(plakaWeights[k]) + ' kg</span>'; h += '<div><button class="btn btn-info btn-xs" onclick="stokDuzenleModalAc(\'' + k + '\')">✏️</button> <button class="btn btn-danger btn-xs" onclick="stokSil(\'' + k + '\')">🗑️</button></div></div>'; }); c.innerHTML = h; }
+window.stokDuzenleModalAc = function(k) { duzenlenenStokKodu = k; document.getElementById("duzenleStokKodu").value = dotTemizle(k); document.getElementById("duzenleStokIsmi").value = stokBilgileri[k] || ""; document.getElementById("duzenleStokPlaka").value = plakaWeights[k] || 0; document.getElementById("duzenleStokGrup").value = stokGruplari[k] || "430"; document.getElementById("stokDuzenleModal").style.display = "block"; };
+document.getElementById("stokGuncelleBtn").onclick = function() { let k = duzenlenenStokKodu; if(!k) return; let yi = document.getElementById("duzenleStokIsmi").value.trim(); let yps = document.getElementById("duzenleStokPlaka").value; let yg = document.getElementById("duzenleStokGrup").value; if(!yi || !yps) { alert("Zorunlu alanlar!"); return; } let yp = parseNumber(yps); if(yp <= 0) { alert("Geçerli plaka!"); return; } stokBilgileri[k] = yi; plakaWeights[k] = yp; stokGruplari[k] = yg; urunleriGuncelle(); syncData(); document.getElementById("stokDuzenleModal").style.display = "none"; stokListesiniGoster(document.getElementById("stokArama").value); };
+window.stokSil = function(k) { if(!confirm(dotTemizle(k) + " silinsin mi?")) return; delete stokBilgileri[k]; delete plakaWeights[k]; delete stokGruplari[k]; urunleriGuncelle(); syncData(); stokListesiniGoster(document.getElementById("stokArama").value); };
 
 window.kapatModal = function(id) { document.getElementById(id).style.display = "none"; if(id === 'detayModal') detayEditingIdx = null; };
 window.onclick = function(e) { if(e.target.classList.contains('modal')) { e.target.style.display = "none"; if(e.target.id === 'detayModal') detayEditingIdx = null; } };
 
 console.log("✅ SAC4 Sac Kesim Takip Sistemi Hazır");
 console.log("🔥 Firebase Projesi: sac4-kesim");
-console.log("👤 Kullanıcı: SAC4 / 4sac4");
+console.log("👑 Admin: Muhammed (mhm2468), Burak (brk2468)");
+console.log("👤 Kullanıcı: SAC4 (4sac4)");
 </script>
 </body>
 </html>
