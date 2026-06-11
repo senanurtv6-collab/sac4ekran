@@ -250,7 +250,8 @@ document.getElementById("ozetTemizleBtn").onclick=function(){
 function ozetiGuncelle(){
     let oa=document.getElementById("ozetAlani");let oi=document.getElementById("ozetIcerik");
     if(!seciliOzetBaslangic||!seciliOzetBitis){oa.style.display="none";return}
-    let bas=new Date(seciliOzetBaslangic);let bit=new Date(seciliOzetBitis);
+  let bas=new Date(seciliOzetBaslangic+"T00:00:00");
+let bit=new Date(seciliOzetBitis+"T23:59:59");
     ozetSonuc=gecmisVeriler.filter(e=>{let kt=e["Kayıt Tarihi"];if(!kt)return false;let parts=kt.split('.');if(parts.length!==3)return false;let trh=new Date(parts[2],parts[1]-1,parts[0]);return trh>=bas&&trh<=bit});
     if(ozetSonuc.length===0){oa.style.display="block";oi.innerHTML='<div class="ozet-item"><div class="ozet-label">📦 Seçili Aralık</div><div class="ozet-deger">Kayıt Yok</div></div>';document.getElementById("ozetExcelBtn").style.display="none";return}
     oa.style.display="block";document.getElementById("ozetExcelBtn").style.display="inline-block";
