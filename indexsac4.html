@@ -319,7 +319,7 @@ function stokGruplariniGuncelle(){
         else if(k.startsWith("HD1")) stokGruplari[k]="DKP";
         else if(k.startsWith("HG1")) stokGruplari[k]="GALVANIZ";
         else if(k.startsWith("HN1")) stokGruplari[k]="304";
-        else if(k.startsWith("HX1.004")) stokGruplari[k]="201";
+        else if(k === "HX1.0043" || k === "HX1.0046") stokGruplari[k]="201";
         else if(k.startsWith("HX1")) stokGruplari[k]="316";
     });
 }
