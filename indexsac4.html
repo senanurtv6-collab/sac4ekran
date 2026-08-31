@@ -174,6 +174,7 @@
 <div id="stokDuzenleModal" class="modal"><div class="modal-content" style="max-width:600px"><span class="close-modal" onclick="kapatModal('stokDuzenleModal')">&times;</span><h2>✏️ Stok Düzenle</h2><div class="form-group"><label>Stok Kodu</label><input type="text" id="duzenleStokKodu" readonly style="background:#f0f0f0"></div><div class="form-group"><label>Grup</label><select id="duzenleStokGrup"><option value="430">430</option><option value="DKP">DKP</option><option value="GALVANIZ">GALVANİZ</option><option value="304">304</option><option value="316">316</option><option value="201">201</option></select></div><div class="form-group"><label>Stok İsmi</label><input type="text" id="duzenleStokIsmi"></div><div class="form-group"><label>1 Plaka (kg)</label><input type="number" id="duzenleStokPlaka" step="0.0001"></div><div class="action-buttons"><button class="btn btn-success" id="stokGuncelleBtn">💾 Güncelle</button><button class="btn btn-secondary" onclick="kapatModal('stokDuzenleModal')">❌ İptal</button></div></div></div>
 
 <script>
+// ==================== SAC4 FIREBASE KONFIGÜRASYONU (DEĞİŞMEDİ) ====================
 const sac4FirebaseConfig={apiKey:"AIzaSyAmlL-xVTWjahrz1VjXx-i86i0TuJ7HBdw",authDomain:"sac4-kesim.firebaseapp.com",databaseURL:"https://sac4-kesim-default-rtdb.europe-west1.firebasedatabase.app",projectId:"sac4-kesim",storageBucket:"sac4-kesim.firebasestorage.app",messagingSenderId:"62938924671",appId:"1:62938924671:web:a23687f982c53db6fa214a"};
 firebase.initializeApp(sac4FirebaseConfig);const database=firebase.database();
 
@@ -182,59 +183,412 @@ let seciliOzetBaslangic="",seciliOzetBitis="",ozetSonuc=[];
 const kullanicilar={SAC4:"4sac4",Muhammed:"mhm2468",Burak:"brk2468"};const adminKullanicilar=["Muhammed","Burak"];
 function isAdmin(){return adminKullanicilar.includes(aktifKullanici)}
 
-let stokBilgileri={"HC1.0001":"430 SB 0,5X3000X1500 PASLANMAZ SAC PLAKA","HC1.0002":"430 SB 0,5X2500X1250 PASLANMAZ SAC PLAKA","HC1.0003":"430 SB 0,5X2000X1000 PASLANMAZ SAC PLAKA","HC1.0004":"430 SB 0,5X1560X1000 PASLANMAZ SAC PLAKA","HC1.0005":"430 SB 0,6X3000X1500 PASLANMAZ SAC PLAKA","HC1.0006":"430 SB 0,7X3000X1500 PASLANMAZ SAC PLAKA","HC1.0007":"430 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA","HC1.0008":"430 SB 1,0X3000X1500 PASLANMAZ SAC PLAKA","HC1.0009":"430 SB 1,5X3000X1500 PASLANMAZ SAC PLAKA","HC1.0010":"430 SB 2,0X3000X1500 PASLANMAZ SAC PLAKA","HC1.0011":"430 SB 3,0X3000X1500 PASLANMAZ SAC PLAKA","HC1.0015":"430 SB 0,5X1680X1000 PASLANMAZ SAC PLAKA","HC1.0018":"430 SB 0,5X1590X850 PASLANMAZ SAC PLAKAS","HC1.0021":"430 SB 0,8X2050X900 PASLANMAZ SAC PLAKA","HC1.0022":"430 SB 0,8X1600X1030 PASLANMAZ SAC PLAKA","HC1.0024":"430 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA","HC1.0025":"430 SB 0,8X1750X800 PASLANMAZ SAC PLAKA","HC1.0027":"430 SB 1X3000X1500 PASLANMAZ SAC PLAKA","HC1.0052":"430 SB 0,8X2000X1000 PASLANMAZ SAC PLAKA","HC1.0058":"430 SB 0,8X1250X2500 PASLANMAZ SAC PLAKA","HC1.0062":"430 SB 0,5X535X425 PASLANMAZ SAC PLAKA (TEZGAH TİP KAPI İÇ SACI)","HC1.0064":"430 SB 1X2000X1000 PASLANMAZ SAC PLAKA","HC1.0073":"430 SB 0,6X1750X850 PASLANMAZ SAC PLAKA","HC1.0074":"430 SB 0,6X2100X950 PASLANMAZ SAC PLAKA","HC1.0075":"430 SB 1X1660X850 PASLANMAZ SAC PLAKA","HC1.0076":"430 SB 1X2120X850 PASLANMAZ SAC PLAKA","HC1.0077":"430 SB 1X2660X850 PASLANMAZ SAC PLAKA","HC1.0078":"430 SB 0,6X1250X2500MM PASLANMAZ SAC PLAKA","HD1.0001":"DKP 0,8X1500X3000 MM SAC","HD1.0002":"DKP 1,5X1250X2500 MM SAC","HD1.0003":"DKP 2,0X1500X3000 MM SAC","HD1.0004":"DKP 3,0X1500X3000 MM SAC","HD1.0005":"DKP 4,0X1500X3000 MM SAC","HD1.0006":"DKP 5,0X1500X3000 MM SAC","HD1.0007":"DKP 6,0X1500X3000 MM SAC","HD1.0008":"DKP 8,0X1500X3000 MM SAC","HD1.0009":"DKP 10,0X1500X3000 MM SAC","HD1.0010":"DKP 12,0X1500X3000 MM SAC","HG1.0001":"GALVANİZ SAC 0,5X2000X1000 PLAKA SAC","HG1.0002":"GALVANİZ SAC 1,5X2000X1000 PLAKA SAC","HG1.0003":"GALVANİZ SAC 2,0X2000X1000 PLAKA SAC","HG1.0004":"GALVANİZ SAC 1,5X3000X1500 PLAKA SAC","HG1.0007":"GALVANİZ 0,5X800X3000 PLAKA SAC","HG1.0008":"GALVANİZ 0,5X800X2800 PLAKA SAC","HG1.0010":"GALVANİZ 0,5X800X2080 PLAKA SAC","HG1.0011":"GALVANİZ 0,5X800X1700 PLAKA SAC","HG1.0012":"GALVANİZ 0,5X1500X3000 PLAKA SAC","HG1.0013":"GALVANİZ 3X2000X1000 PLAKA SAC","HG1.0016":"GALVANİZ 0,5X1250X2500 PLAKA SAC","HG1.0018":"GALVANİZ SAC 1,5X2500X1250 PLAKA SAC","HG1.0019":"GALVANİZ BOYALI SAC 0,5X1250X2000 RAL 9002 (BEYAZ)","HG1.0020":"GALVANİZ 0,5X2000X1000 PLAKA SAC","HG1.0021":"GALVANİZ BOYALI SAC 0,5X1250X2300 RAL 9002 (BEYAZ)","HN1.0001":"304 2B 0,5x3000x1500 PASLANMAZ SAC","HN1.0002":"304 2B 0,8x3000x1500 PASLANMAZ SAC","HN1.0003":"304 2B 1,0x3000x1500 PASLANMAZ SAC","HN1.0004":"304 2B 1,5x3000x1500 PASLANMAZ SAC","HN1.0005":"304 2B 2,0x3000x1500 PASLANMAZ SAC","HN1.0006":"304 2B 3,0x3000x1500 PASLANMAZ SAC","HN1.0011":"304 SB 1X3000X1500 PASLANMAZ SAC PLAKA","HN1.0012":"304 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA","HN1.0013":"304 SB 0,5X1590X850 PASLANMAZ SAC PLAKAS","HN1.0015":"304 SB 0,5X2000X1000 PASLANMAZ SAC PLAKA","HN1.0016":"304 SB 0,5X1560X1000 PASLANMAZ SAC PLAKA","HN1.0018":"304 SB 0,5X3000X1500 PASLANMAZ SAC PLAKA","HN1.0019":"304 SB 0,8X1030X1600 PASLANMAZ SAC PLAKA","HN1.0020":"304 SB 0,5X1000X1680 PASLANMAZ SAC PLAKA","HN1.0021":"304 SB 0,8X2050X900 PASLANMAZ SAC PLAKA","HN1.0022":"304 SB 0,8X1750X800 PASLANMAZ SAC PLAKA","HN1.0025":"304 SB 0,8X2000X1000 PASLANMAZ SAC PLAKA","HN1.0026":"304 SB 0,8X2500X1250 PASLANMAZ SAC PLAKA","HN1.0028":"304 SB 1X2000X1000 PASLANMAZ SAC","HN1.0029":"304 SB 0,5X1515X595 MM (610 KAPI İÇ SACI)","HN1.0032":"304 SB 0,5X1250X2500 PASLANMAZ SAC PLAKA","HN1.0035":"304 SB 1X2660X850 PASLANMAZ SAC PLAKA","HN1.0036":"304 SB 0,6X1750X850 PASLANMAZ SAC PLAKA","HN1.0037":"304 SB 0,6X2100X950 PASLANMAZ SAC PLAKA","HN1.0038":"304 SB 1X1660X850 PASLANMAZ SAC","HN1.0040":"304 SB 1X2120X850 PASLANMAZ SAC","HN1.0043":"304 SB 0,5X535X425 PASLANMAZ SAC (TEZGAH TİP KAPI İÇ SACI)","HN1.0048":"304 SB 2X1000X2000 PASLANMAZ SAC","HX1.0001":"316 SB 0,5X3000X1500 PASLANMAZ SAC PLAKA","HX1.0002":"316 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA","HX1.0003":"316 SB 1,0X3000X1500 PASLANMAZ SAC PLAKA","HX1.0004":"316 SB 1,5X3000X1500 PASLANMAZ SAC PLAKA","HX1.0005":"316 SB 2,0X3000X1500 PASLANMAZ SAC PLAKA","HX1.0043":"201 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA","HX1.0044":"201 SB 1,0X3000X1500 PASLANMAZ SAC PLAKA","HX1.0045":"316 SB 0,8X1250X2500 PASLANMAZ SAC","HX1.0046":"201 SB 0,8X1030X2000 PASLANMAZ SAC PLAKA"};
-let plakaWeights={"HC1.0001":17.7746,"HC1.0002":12.3447,"HC1.0003":7.8500,"HC1.0004":6.1300,"HC1.0005":21.3300,"HC1.0006":24.8850,"HC1.0007":28.4400,"HC1.0008":35.5500,"HC1.0009":53.3250,"HC1.0010":71.1000,"HC1.0011":106.6500,"HC1.0015":6.6400,"HC1.0018":5.3400,"HC1.0021":11.6600,"HC1.0022":10.9400,"HC1.0024":28.4400,"HC1.0025":8.8500,"HC1.0027":35.5500,"HC1.0052":12.3400,"HC1.0058":19.7500,"HC1.0062":0.9000,"HC1.0064":15.8000,"HC1.0073":7.0500,"HC1.0074":9.4600,"HC1.0075":11.1500,"HC1.0076":14.2400,"HC1.0077":17.8600,"HC1.0078":2.0000,"HD1.0001":28.0000,"HD1.0002":37.0000,"HD1.0003":71.1000,"HD1.0004":106.6500,"HD1.0005":142.2000,"HD1.0006":177.7500,"HD1.0007":213.3000,"HD1.0008":284.4000,"HD1.0009":355.5000,"HD1.0010":426.6000,"HG1.0001":7.8500,"HG1.0002":24.2925,"HG1.0003":31.4000,"HG1.0004":55.6200,"HG1.0007":9.4800,"HG1.0008":8.8500,"HG1.0010":6.6000,"HG1.0011":5.3700,"HG1.0012":17.7700,"HG1.0013":48.0500,"HG1.0016":12.3400,"HG1.0018":37.0300,"HG1.0019":9.8800,"HG1.0020":7.9000,"HG1.0021":11.3600,"HN1.0001":17.7750,"HN1.0002":28.4417,"HN1.0003":35.5500,"HN1.0004":53.3250,"HN1.0005":71.1000,"HN1.0006":106.6500,"HN1.0011":48.0500,"HN1.0012":28.4400,"HN1.0013":5.3400,"HN1.0015":7.9000,"HN1.0016":6.1600,"HN1.0018":17.7700,"HN1.0019":10.4100,"HN1.0020":6.6400,"HN1.0021":11.6600,"HN1.0022":8.8500,"HN1.0025":12.3400,"HN1.0026":19.7500,"HN1.0028":15.8000,"HN1.0029":3.5600,"HN1.0032":12.3400,"HN1.0035":17.8600,"HN1.0036":7.0500,"HN1.0037":9.4600,"HN1.0038":11.1500,"HN1.0040":14.2400,"HN1.0043":0.9000,"HN1.0048":28.4400,"HX1.0001":17.7750,"HX1.0002":28.4400,"HX1.0003":35.5500,"HX1.0004":53.3250,"HX1.0005":71.1000,"HX1.0043":28.4400,"HX1.0044":35.5500,"HX1.0045":35.5500,"HX1.0046":12.9900};
-let stokGruplari={},urunler={};
-function stokGruplariniGuncelle(){stokGruplari={};Object.keys(stokBilgileri).forEach(function(k){if(k.startsWith("HC1"))stokGruplari[k]="430";else if(k.startsWith("HD1"))stokGruplari[k]="DKP";else if(k.startsWith("HG1"))stokGruplari[k]="GALVANIZ";else if(k.startsWith("HN1"))stokGruplari[k]="304";else if(k.startsWith("HX1.004"))stokGruplari[k]="201";else if(k.startsWith("HX1"))stokGruplari[k]="316"})}
-function urunleriGuncelle(){urunler={430:Object.keys(stokBilgileri).filter(k=>stokGruplari[k]==="430"),DKP:Object.keys(stokBilgileri).filter(k=>stokGruplari[k]==="DKP"),GALVANIZ:Object.keys(stokBilgileri).filter(k=>stokGruplari[k]==="GALVANIZ"),304:Object.keys(stokBilgileri).filter(k=>stokGruplari[k]==="304"),316:Object.keys(stokBilgileri).filter(k=>stokGruplari[k]==="316"),201:Object.keys(stokBilgileri).filter(k=>stokGruplari[k]==="201")}}
+// ==================== YENİ STOK VERİLERİ (SAC4) ====================
+let stokBilgileri = {
+    "HC1.0001": "430 SB 0,5X3000X1500 PASLANMAZ SAC PLAKA",
+    "HC1.0002": "430 SB 0,5X2500X1250 PASLANMAZ SAC PLAKA",
+    "HC1.0003": "430 SB 0,5X2000X1000 PASLANMAZ SAC PLAKA",
+    "HC1.0004": "430 SB 0,5X1560X1000 PASLANMAZ SAC PLAKA",
+    "HC1.0005": "430 SB 0,5X1980X780 PASLANMAZ SAC PLAKA",
+    "HC1.0015": "430 SB 0,5X1680X1000 PASLANMAZ SAC PLAKA",
+    "HC1.0018": "430 SB 0,5X1590X850 PASLANMAZ SAC PLAKA",
+    "HC1.0021": "430 SB 0,8X2050X900 PASLANMAZ SAC PLAKA",
+    "HC1.0022": "430 SB 0,8X1600X1030 PASLANMAZ SAC PLAKA",
+    "HC1.0024": "430 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA",
+    "HC1.0025": "430 SB 0,8X1750X800 PASLANMAZ SAC PLAKA",
+    "HC1.0027": "430 SB 1X3000X1500 PASLANMAZ SAC PLAKA",
+    "HC1.0052": "430 SB 0,8X2000X1000 PASLANMAZ SAC PLAKA",
+    "HC1.0058": "430 SB 0,8X1250X2500 PASLANMAZ SAC PLAKA",
+    "HC1.0064": "430 SB 1X2000X1000 PASLANMAZ SAC PLAKA",
+    "HC1.0073": "430 SB 0,6X1750X850 PASLANMAZ SAC PLAKA",
+    "HC1.0074": "430 SB 0,6X2100X950 PASLANMAZ SAC PLAKA",
+    "HC1.0075": "430 SB 1X1660X850 PASLANMAZ SAC PLAKA",
+    "HC1.0076": "430 SB 1X2120X850 PASLANMAZ SAC PLAKA",
+    "HC1.0077": "430 SB 1X2660X850 PASLANMAZ SAC PLAKA",
+    "HD1.0001": "DKP 0,8X1500X3000 MM SAC",
+    "HD1.0002": "DKP 1,5X1250X2500 MM SAC",
+    "HG1.0002": "GALVANİZ SAC 1,5X2000X1000 PLAKA SAC",
+    "HG1.0004": "GALVANİZ SAC 1,5X3000X1500 PLAKA SAC",
+    "HG1.0007": "GALVANİZ 0,5X800X3000 PLAKA SAC",
+    "HG1.0008": "GALVANİZ 0,5X800X2800 PLAKA SAC",
+    "HG1.0010": "GALVANİZ 0,5X800X2080 PLAKA SAC",
+    "HG1.0011": "GALVANİZ 0,5X800X1700 PLAKA SAC",
+    "HG1.0012": "GALVANİZ 0,5X1500X3000 PLAKA SAC",
+    "HG1.0013": "GALVANİZ 3X2000X1000 PLAKA SAC",
+    "HG1.0018": "GALVANİZ SAC 1,5X2500X1250 PLAKA SAC",
+    "HG1.0019": "GALVANİZ BOYALI SAC 0,5X1250X2000 PLAKA SAC RAL 9002 (BEYAZ)",
+    "HG1.0020": "GALVANİZ 0,5X2000X1000 PLAKA SAC",
+    "HG1.0021": "GALVANİZ BOYALI SAC 0,5X1250X2300 PLAKA SAC RAL 9002 (BEYAZ)",
+    "HN1.0006": "304 SB 0,5X1980X780 PASLANMAZ SAC PLAKA",
+    "HN1.0011": "304 SB 1X3000X1500 PASLANMAZ SAC PLAKA",
+    "HN1.0012": "304 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA",
+    "HN1.0013": "304 SB 0,5X1590X850 PASLANMAZ SAC PLAKA",
+    "HN1.0015": "304 SB 0,5X2000X1000 PASLANMAZ SAC PLAKA",
+    "HN1.0016": "304 SB 0,5X1560X1000 PASLANMAZ SAC PLAKA",
+    "HN1.0018": "304 SB 0,5X3000X1500 PASLANMAZ SAC PLAKA",
+    "HN1.0019": "304 SB 0,8X1030X1600 PASLANMAZ SAC PLAKA",
+    "HN1.0020": "304 SB 0,5X1000X1680 PASLANMAZ SAC PLAKA",
+    "HN1.0021": "304 SB 0,8X2050X900 PASLANMAZ SAC PLAKA",
+    "HN1.0022": "304 SB 0,8X1750X800 PASLANMAZ SAC PLAKA",
+    "HN1.0025": "304 SB 0,8X2000X1000 PASLANMAZ SAC PLAKA",
+    "HN1.0026": "304 SB 0,8X2500X1250 PASLANMAZ SAC PLAKA",
+    "HN1.0028": "304 SB 1X2000X1000 PASLANMAZ SAC",
+    "HN1.0032": "304 SB 0,5X1250X2500 PASLANMAZ SAC PLAKA",
+    "HN1.0035": "304 SB 1X2660X850 PASLANMAZ SAC PLAKA",
+    "HN1.0036": "304 SB 0,6X1750X850 PASLANMAZ SAC PLAKA",
+    "HN1.0037": "304 SB 0,6X2100X950 PASLANMAZ SAC PLAKA",
+    "HN1.0038": "304 SB 1X1660X850 PASLANMAZ SAC",
+    "HN1.0040": "304 SB 1X2120X850 PASLANMAZ SAC",
+    "HN1.0048": "304 SB 2x1000x2000 PASLANMAZ SAC PLAKA",
+    "HX1.0002": "316 SB 0,5X1600X1000 PASLANMAZ SAC PLAKA",
+    "HX1.0043": "201 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA",
+    "HX1.0044": "316 SB 1X3000X1500 PASLANMAZ SAC PLAKA",
+    "HX1.0045": "316 SB 0,80X1250X2500 PASLANMAZ SAC",
+    "HX1.0046": "201 SB 0,8X1030x2000 PASLANMAZ SAC PLAKA"
+};
+
+let plakaWeights = {
+    "HC1.0001": 17.78,
+    "HC1.0002": 12.34,
+    "HC1.0003": 7.90,
+    "HC1.0004": 6.16,
+    "HC1.0005": 6.10,
+    "HC1.0015": 6.64,
+    "HC1.0018": 5.34,
+    "HC1.0021": 11.66,
+    "HC1.0022": 10.94,
+    "HC1.0024": 28.44,
+    "HC1.0025": 8.85,
+    "HC1.0027": 35.55,
+    "HC1.0052": 12.64,
+    "HC1.0058": 19.75,
+    "HC1.0064": 15.80,
+    "HC1.0073": 7.05,
+    "HC1.0074": 9.46,
+    "HC1.0075": 11.15,
+    "HC1.0076": 14.24,
+    "HC1.0077": 17.86,
+    "HD1.0001": 28.00,
+    "HD1.0002": 37.00,
+    "HG1.0002": 24.29,
+    "HG1.0004": 53.32,
+    "HG1.0007": 9.48,
+    "HG1.0008": 8.85,
+    "HG1.0010": 6.57,
+    "HG1.0011": 5.37,
+    "HG1.0012": 17.78,
+    "HG1.0013": 47.40,
+    "HG1.0018": 12.50,
+    "HG1.0019": 9.88,
+    "HG1.0020": 7.90,
+    "HG1.0021": 11.36,
+    "HN1.0006": 6.10,
+    "HN1.0011": 35.55,
+    "HN1.0012": 28.44,
+    "HN1.0013": 5.34,
+    "HN1.0015": 7.90,
+    "HN1.0016": 6.16,
+    "HN1.0018": 17.77,
+    "HN1.0019": 10.42,
+    "HN1.0020": 6.64,
+    "HN1.0021": 11.66,
+    "HN1.0022": 8.85,
+    "HN1.0025": 12.64,
+    "HN1.0026": 19.75,
+    "HN1.0028": 15.80,
+    "HN1.0032": 12.34,
+    "HN1.0035": 17.86,
+    "HN1.0036": 7.05,
+    "HN1.0037": 9.46,
+    "HN1.0038": 11.15,
+    "HN1.0040": 14.24,
+    "HN1.0048": 32.00,
+    "HX1.0002": 6.32,
+    "HX1.0043": 28.44,
+    "HX1.0044": 35.55,
+    "HX1.0045": 35.55,
+    "HX1.0046": 13.00
+};
+
+// ==================== STOK GRUPLARI (OTOMATİK) ====================
+let stokGruplari={};
+function stokGruplariniGuncelle(){
+    stokGruplari={};
+    Object.keys(stokBilgileri).forEach(function(k){
+        if(k.startsWith("HC1")) stokGruplari[k]="430";
+        else if(k.startsWith("HD1")) stokGruplari[k]="DKP";
+        else if(k.startsWith("HG1")) stokGruplari[k]="GALVANIZ";
+        else if(k.startsWith("HN1")) stokGruplari[k]="304";
+        else if(k.startsWith("HX1.004")) stokGruplari[k]="201";
+        else if(k.startsWith("HX1")) stokGruplari[k]="316";
+    });
+}
+let urunler={};
+function urunleriGuncelle(){
+    urunler={};
+    ["430","DKP","GALVANIZ","304","316","201"].forEach(g => {
+        urunler[g]=Object.keys(stokBilgileri).filter(k=>stokGruplari[k]===g);
+    });
+}
 stokGruplariniGuncelle();urunleriGuncelle();
+
 function dotTemizle(k){return k?k.replace(/_DOT_/g,'.'):""}
-function getStokIsmi(k){if(stokBilgileri[k])return stokBilgileri[k];let t=dotTemizle(k);return stokBilgileri[t]||""}
-function getPlakaWeight(k){if(plakaWeights[k]!==undefined)return plakaWeights[k];let t=dotTemizle(k);return plakaWeights[t]||0}
+function getStokIsmi(k){return stokBilgileri[k]||""}
+function getPlakaWeight(k){return plakaWeights[k]||0}
 function tumStoklariGetir(){return Object.keys(stokBilgileri)}
 function parseNumber(v){if(typeof v==='number')return v;if(!v)return 0;let n=parseFloat(v.toString().replace(',','.'));return isNaN(n)?0:n}
 function formatNumber(n){return parseNumber(n).toFixed(2)}
 function formatNumberDisplay(n){return formatNumber(n).replace('.',',')}
 
-function saveToFirebase(){let gs={};Object.keys(stokBilgileri).forEach(k=>{gs[k.replace(/\./g,'_DOT_')]=stokBilgileri[k]});let gp={};Object.keys(plakaWeights).forEach(k=>{gp[k.replace(/\./g,'_DOT_')]=plakaWeights[k]});let gg={};Object.keys(stokGruplari).forEach(k=>{gg[k.replace(/\./g,'_DOT_')]=stokGruplari[k]});const d={gecmisVeriler,siraNo,silinenSiralar,aktarilanEvraklar,stokBilgileri:gs,plakaWeights:gp,stokGruplari:gg,ajandaVerileri,lastUpdated:firebase.database.ServerValue.TIMESTAMP};return database.ref('sac4Kesim/').set(d)}
-function loadFromFirebase(){database.ref('sac4Kesim/').once('value').then(sn=>{const d=sn.val();if(d){if(d.gecmisVeriler)gecmisVeriler=d.gecmisVeriler;if(d.siraNo!==undefined)siraNo=d.siraNo;if(d.silinenSiralar)silinenSiralar=d.silinenSiralar;if(d.aktarilanEvraklar)aktarilanEvraklar=d.aktarilanEvraklar;if(d.ajandaVerileri)ajandaVerileri=d.ajandaVerileri;if(d.stokBilgileri){let ts={};Object.keys(d.stokBilgileri).forEach(k=>{ts[k.replace(/_DOT_/g,'.')]=d.stokBilgileri[k]});stokBilgileri=ts}if(d.plakaWeights){let tp={};Object.keys(d.plakaWeights).forEach(k=>{tp[k.replace(/_DOT_/g,'.')]=d.plakaWeights[k]});plakaWeights=tp}if(d.stokGruplari){let tg={};Object.keys(d.stokGruplari).forEach(k=>{tg[k.replace(/_DOT_/g,'.')]=d.stokGruplari[k]});stokGruplari=tg}stokGruplariniGuncelle();urunleriGuncelle();gecmisVeriler=gecmisVeriler.filter(e=>!silinenSiralar.includes(e["Sıra No"]));document.getElementById("syncStatus").innerHTML="✅ SAC4 Firebase Aktif";document.getElementById("syncStatus").className="sync-status online"}else{saveToFirebase();document.getElementById("syncStatus").innerHTML="✅ SAC4 Firebase Aktif (Yeni)";document.getElementById("syncStatus").className="sync-status online"}if(aktifKullanici){rolBilgiGuncelle();stokDuzenleButonKontrol();excelButonlariniKontrol();ajandaButonKontrol()}yeniStoklariKontrolEtVeGuncelle()}).catch(e=>{console.error("Firebase okuma hatası:",e);document.getElementById("syncStatus").innerHTML="⚠️ Bağlantı hatası";document.getElementById("syncStatus").className="sync-status offline"})}
-function yeniStoklariKontrolEtVeGuncelle(){let g=false;const ys={"HC1.0015":{isim:"430 SB 0,5X1680X1000 PASLANMAZ SAC PLAKA",plaka:6.6400},"HC1.0018":{isim:"430 SB 0,5X1590X850 PASLANMAZ SAC PLAKAS",plaka:5.3400},"HC1.0021":{isim:"430 SB 0,8X2050X900 PASLANMAZ SAC PLAKA",plaka:11.6600},"HC1.0022":{isim:"430 SB 0,8X1600X1030 PASLANMAZ SAC PLAKA",plaka:10.9400},"HC1.0024":{isim:"430 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA",plaka:28.4400},"HC1.0025":{isim:"430 SB 0,8X1750X800 PASLANMAZ SAC PLAKA",plaka:8.8500},"HC1.0027":{isim:"430 SB 1X3000X1500 PASLANMAZ SAC PLAKA",plaka:35.5500},"HC1.0052":{isim:"430 SB 0,8X2000X1000 PASLANMAZ SAC PLAKA",plaka:12.3400},"HC1.0058":{isim:"430 SB 0,8X1250X2500 PASLANMAZ SAC PLAKA",plaka:19.7500},"HC1.0062":{isim:"430 SB 0,5X535X425 PASLANMAZ SAC PLAKA (TEZGAH TİP KAPI İÇ SACI)",plaka:0.9000},"HC1.0064":{isim:"430 SB 1X2000X1000 PASLANMAZ SAC PLAKA",plaka:15.8000},"HC1.0073":{isim:"430 SB 0,6X1750X850 PASLANMAZ SAC PLAKA",plaka:7.0500},"HC1.0074":{isim:"430 SB 0,6X2100X950 PASLANMAZ SAC PLAKA",plaka:9.4600},"HC1.0075":{isim:"430 SB 1X1660X850 PASLANMAZ SAC PLAKA",plaka:11.1500},"HC1.0076":{isim:"430 SB 1X2120X850 PASLANMAZ SAC PLAKA",plaka:14.2400},"HC1.0077":{isim:"430 SB 1X2660X850 PASLANMAZ SAC PLAKA",plaka:17.8600},"HC1.0078":{isim:"430 SB 0,6X1250X2500MM PASLANMAZ SAC PLAKA",plaka:2.0000},"HG1.0004":{isim:"GALVANİZ SAC 1,5X3000X1500 PLAKA SAC",plaka:55.6200},"HG1.0007":{isim:"GALVANİZ 0,5X800X3000 PLAKA SAC",plaka:9.4800},"HG1.0008":{isim:"GALVANİZ 0,5X800X2800 PLAKA SAC",plaka:8.8500},"HG1.0010":{isim:"GALVANİZ 0,5X800X2080 PLAKA SAC",plaka:6.6000},"HG1.0011":{isim:"GALVANİZ 0,5X800X1700 PLAKA SAC",plaka:5.3700},"HG1.0012":{isim:"GALVANİZ 0,5X1500X3000 PLAKA SAC",plaka:17.7700},"HG1.0013":{isim:"GALVANİZ 3X2000X1000 PLAKA SAC",plaka:48.0500},"HG1.0016":{isim:"GALVANİZ 0,5X1250X2500 PLAKA SAC",plaka:12.3400},"HG1.0018":{isim:"GALVANİZ SAC 1,5X2500X1250 PLAKA SAC",plaka:37.0300},"HG1.0019":{isim:"GALVANİZ BOYALI SAC 0,5X1250X2000 RAL 9002 (BEYAZ)",plaka:9.8800},"HG1.0020":{isim:"GALVANİZ 0,5X2000X1000 PLAKA SAC",plaka:7.9000},"HG1.0021":{isim:"GALVANİZ BOYALI SAC 0,5X1250X2300 RAL 9002 (BEYAZ)",plaka:11.3600},"HN1.0011":{isim:"304 SB 1X3000X1500 PASLANMAZ SAC PLAKA",plaka:48.0500},"HN1.0012":{isim:"304 SB 0,8X3000X1500 PASLANMAZ SAC PLAKA",plaka:28.4400},"HN1.0013":{isim:"304 SB 0,5X1590X850 PASLANMAZ SAC PLAKAS",plaka:5.3400},"HN1.0015":{isim:"304 SB 0,5X2000X1000 PASLANMAZ SAC PLAKA",plaka:7.9000},"HN1.0016":{isim:"304 SB 0,5X1560X1000 PASLANMAZ SAC PLAKA",plaka:6.1600},"HN1.0018":{isim:"304 SB 0,5X3000X1500 PASLANMAZ SAC PLAKA",plaka:17.7700},"HN1.0019":{isim:"304 SB 0,8X1030X1600 PASLANMAZ SAC PLAKA",plaka:10.4100},"HN1.0020":{isim:"304 SB 0,5X1000X1680 PASLANMAZ SAC PLAKA",plaka:6.6400},"HN1.0021":{isim:"304 SB 0,8X2050X900 PASLANMAZ SAC PLAKA",plaka:11.6600},"HN1.0022":{isim:"304 SB 0,8X1750X800 PASLANMAZ SAC PLAKA",plaka:8.8500},"HN1.0025":{isim:"304 SB 0,8X2000X1000 PASLANMAZ SAC PLAKA",plaka:12.3400},"HN1.0026":{isim:"304 SB 0,8X2500X1250 PASLANMAZ SAC PLAKA",plaka:19.7500},"HN1.0028":{isim:"304 SB 1X2000X1000 PASLANMAZ SAC",plaka:15.8000},"HN1.0029":{isim:"304 SB 0,5X1515X595 MM (610 KAPI İÇ SACI)",plaka:3.5600},"HN1.0032":{isim:"304 SB 0,5X1250X2500 PASLANMAZ SAC PLAKA",plaka:12.3400},"HN1.0035":{isim:"304 SB 1X2660X850 PASLANMAZ SAC PLAKA",plaka:17.8600},"HN1.0036":{isim:"304 SB 0,6X1750X850 PASLANMAZ SAC PLAKA",plaka:7.0500},"HN1.0037":{isim:"304 SB 0,6X2100X950 PASLANMAZ SAC PLAKA",plaka:9.4600},"HN1.0038":{isim:"304 SB 1X1660X850 PASLANMAZ SAC",plaka:11.1500},"HN1.0040":{isim:"304 SB 1X2120X850 PASLANMAZ SAC",plaka:14.2400},"HN1.0043":{isim:"304 SB 0,5X535X425 PASLANMAZ SAC (TEZGAH TİP KAPI İÇ SACI)",plaka:0.9000},"HN1.0048":{isim:"304 SB 2X1000X2000 PASLANMAZ SAC",plaka:28.4400},"HX1.0045":{isim:"316 SB 0,8X1250X2500 PASLANMAZ SAC",plaka:35.5500},"HX1.0046":{isim:"201 SB 0,8X1030X2000 PASLANMAZ SAC PLAKA",plaka:12.9900}};Object.keys(ys).forEach(k=>{if(!stokBilgileri[k]){stokBilgileri[k]=ys[k].isim;plakaWeights[k]=ys[k].plaka;g=true}});if(g){stokGruplariniGuncelle();urunleriGuncelle();saveToFirebase()}}
+// ==================== FIREBASE İŞLEMLERİ (DEĞİŞMEDİ) ====================
+function saveToFirebase(){
+    let gs={};Object.keys(stokBilgileri).forEach(k=>{gs[k.replace(/\./g,'_DOT_')]=stokBilgileri[k]});
+    let gp={};Object.keys(plakaWeights).forEach(k=>{gp[k.replace(/\./g,'_DOT_')]=plakaWeights[k]});
+    let gg={};Object.keys(stokGruplari).forEach(k=>{gg[k.replace(/\./g,'_DOT_')]=stokGruplari[k]});
+    const d={gecmisVeriler,siraNo,silinenSiralar,aktarilanEvraklar,stokBilgileri:gs,plakaWeights:gp,stokGruplari:gg,ajandaVerileri,lastUpdated:firebase.database.ServerValue.TIMESTAMP};
+    return database.ref('sac4Kesim/').set(d);
+}
+
+function loadFromFirebase(){
+    database.ref('sac4Kesim/').once('value').then(sn=>{
+        const d=sn.val();
+        if(d){
+            if(d.gecmisVeriler) gecmisVeriler=d.gecmisVeriler;
+            if(d.siraNo!==undefined) siraNo=d.siraNo;
+            if(d.silinenSiralar) silinenSiralar=d.silinenSiralar;
+            if(d.aktarilanEvraklar) aktarilanEvraklar=d.aktarilanEvraklar;
+            if(d.ajandaVerileri) ajandaVerileri=d.ajandaVerileri;
+            if(d.stokBilgileri){let ts={};Object.keys(d.stokBilgileri).forEach(k=>{ts[k.replace(/_DOT_/g,'.')]=d.stokBilgileri[k]});stokBilgileri=ts}
+            if(d.plakaWeights){let tp={};Object.keys(d.plakaWeights).forEach(k=>{tp[k.replace(/_DOT_/g,'.')]=d.plakaWeights[k]});plakaWeights=tp}
+            if(d.stokGruplari){let tg={};Object.keys(d.stokGruplari).forEach(k=>{tg[k.replace(/_DOT_/g,'.')]=d.stokGruplari[k]});stokGruplari=tg}
+            stokGruplariniGuncelle();urunleriGuncelle();
+            gecmisVeriler=gecmisVeriler.filter(e=>!silinenSiralar.includes(e["Sıra No"]));
+            document.getElementById("syncStatus").innerHTML="✅ SAC4 Firebase Aktif";
+            document.getElementById("syncStatus").className="sync-status online";
+        }else{saveToFirebase();document.getElementById("syncStatus").innerHTML="✅ SAC4 Firebase Aktif (Yeni)";document.getElementById("syncStatus").className="sync-status online"}
+        if(aktifKullanici){rolBilgiGuncelle();stokDuzenleButonKontrol();excelButonlariniKontrol();ajandaButonKontrol()}
+    }).catch(e=>{console.error("Firebase okuma hatası:",e);document.getElementById("syncStatus").innerHTML="⚠️ Bağlantı hatası";document.getElementById("syncStatus").className="sync-status offline"});
+}
 
 function syncData(){saveToFirebase()}
 function getSiraNo(){let ms=siraNo+1;while(silinenSiralar.includes(ms))ms++;return ms}
 function siranoArtir(){siraNo++;syncData()}
 function getDurum(e){let a=aktarilanEvraklar.includes(e["Sıra No"]);let d=e["Duzenlendi"]||false;if(a)return"Excel'e Aktarıldı";if(d)return"Düzenlendi";return"Bekliyor"}
 function evrakAktarildiMi(e){return aktarilanEvraklar.includes(e["Sıra No"])}
-function rolBilgiGuncelle(){let b=document.getElementById("userRolBadge");let bi=document.getElementById("rolBilgiAlani");if(isAdmin()){b.innerHTML='<span class="admin-badge">Admin</span>';bi.innerHTML='<div class="admin-note">👑 <strong>Admin Yetkisi:</strong> Tüm evrakları düzenleyebilir, silebilir ve Excel\'e aktarabilirsiniz. Stok düzenleme ve Ajanda sayfalarına erişebilirsiniz.</div>'}else{b.innerHTML='<span class="kullanici-badge">Kullanıcı</span>';bi.innerHTML='<div class="user-note">🔒 <strong>Kullanıcı Yetkisi:</strong> Sadece evrak oluşturabilir ve görüntüleyebilirsiniz.</div>'}}
+
+// ==================== YARDIMCI FONKSİYONLAR ====================
+function rolBilgiGuncelle(){
+    let b=document.getElementById("userRolBadge");let bi=document.getElementById("rolBilgiAlani");
+    if(isAdmin()){
+        b.innerHTML='<span class="admin-badge">Admin</span>';
+        bi.innerHTML='<div class="admin-note">👑 <strong>Admin Yetkisi:</strong> Tüm evrakları düzenleyebilir, silebilir ve Excel\'e aktarabilirsiniz. Stok düzenleme ve Ajanda sayfalarına erişebilirsiniz.</div>';
+    }else{
+        b.innerHTML='<span class="kullanici-badge">Kullanıcı</span>';
+        bi.innerHTML='<div class="user-note">🔒 <strong>Kullanıcı Yetkisi:</strong> Sadece evrak oluşturabilir ve görüntüleyebilirsiniz.</div>';
+    }
+}
 function stokDuzenleButonKontrol(){document.getElementById("stokDuzenleBtn").style.display=isAdmin()?"inline-block":"none"}
 function ajandaButonKontrol(){document.getElementById("ajandaBtn").style.display=isAdmin()?"inline-block":"none"}
 function excelButonlariniKontrol(){const d=document.getElementById("excelActionsDiv");if(d)d.style.display=isAdmin()?"flex":"none"}
 
-document.getElementById("loginBtn").onclick=function(){let u=document.getElementById("loginUsername").value.trim();let p=document.getElementById("loginPassword").value.trim();if(kullanicilar[u]&&kullanicilar[u]===p){aktifKullanici=u;document.getElementById("loginPage").style.display="none";document.getElementById("mainPage").style.display="block";document.getElementById("currentUser").textContent=u;document.getElementById("loginError").style.display="none";rolBilgiGuncelle();stokDuzenleButonKontrol();excelButonlariniKontrol();ajandaButonKontrol();anaSayfayaDon();loadFromFirebase()}else{document.getElementById("loginError").style.display="block"}};
+// ==================== LOGİN ====================
+document.getElementById("loginBtn").onclick=function(){
+    let u=document.getElementById("loginUsername").value.trim();
+    let p=document.getElementById("loginPassword").value.trim();
+    if(kullanicilar[u]&&kullanicilar[u]===p){
+        aktifKullanici=u;
+        document.getElementById("loginPage").style.display="none";
+        document.getElementById("mainPage").style.display="block";
+        document.getElementById("currentUser").textContent=u;
+        document.getElementById("loginError").style.display="none";
+        rolBilgiGuncelle();stokDuzenleButonKontrol();excelButonlariniKontrol();ajandaButonKontrol();
+        anaSayfayaDon();loadFromFirebase();
+    }else{document.getElementById("loginError").style.display="block"}
+};
 document.getElementById("logoutBtn").onclick=function(){aktifKullanici=null;document.getElementById("mainPage").style.display="none";document.getElementById("loginPage").style.display="flex";document.getElementById("loginUsername").value="";document.getElementById("loginPassword").value=""};
 document.getElementById("loginPassword").addEventListener("keypress",function(e){if(e.key==="Enter")document.getElementById("loginBtn").click()});
 
-function anaSayfayaDon(){document.getElementById("yeniGirisAlan").classList.remove("hidden");document.getElementById("oncekiGirislerAlan").classList.add("hidden");document.getElementById("stokDuzenleAlan").classList.add("hidden");document.getElementById("ajandaAlan").classList.add("hidden");document.getElementById("stokGrubu").selectedIndex=0;document.getElementById("urunSecim").style.display="none";document.getElementById("tabloAlan").style.display="none";document.getElementById("tabloAlan").innerHTML="";document.getElementById("mesaj").innerHTML=""}
-document.getElementById("yeniGirisBtn").onclick=anaSayfayaDon;document.getElementById("yeniKayitDonBtn").onclick=anaSayfayaDon;document.getElementById("oncekiGirislerBtn").onclick=gecmisListesiniGoster;
-document.getElementById("stokDuzenleBtn").onclick=function(){if(isAdmin())stokDuzenleSayfasiniAc()};document.getElementById("stokDuzenleCikBtn").onclick=anaSayfayaDon;
-document.getElementById("ajandaBtn").onclick=function(){if(isAdmin())ajandaSayfasiniAc()};document.getElementById("ajandaCikBtn").onclick=anaSayfayaDon;
-function stokDuzenleSayfasiniAc(){document.getElementById("yeniGirisAlan").classList.add("hidden");document.getElementById("oncekiGirislerAlan").classList.add("hidden");document.getElementById("ajandaAlan").classList.add("hidden");document.getElementById("stokDuzenleAlan").classList.remove("hidden");stokListesiniGoster()}
+function anaSayfayaDon(){
+    document.getElementById("yeniGirisAlan").classList.remove("hidden");
+    document.getElementById("oncekiGirislerAlan").classList.add("hidden");
+    document.getElementById("stokDuzenleAlan").classList.add("hidden");
+    document.getElementById("ajandaAlan").classList.add("hidden");
+    document.getElementById("stokGrubu").selectedIndex=0;
+    document.getElementById("urunSecim").style.display="none";
+    document.getElementById("tabloAlan").style.display="none";
+    document.getElementById("tabloAlan").innerHTML="";
+    document.getElementById("mesaj").innerHTML="";
+}
+document.getElementById("yeniGirisBtn").onclick=anaSayfayaDon;
+document.getElementById("yeniKayitDonBtn").onclick=anaSayfayaDon;
+document.getElementById("oncekiGirislerBtn").onclick=gecmisListesiniGoster;
+document.getElementById("stokDuzenleBtn").onclick=function(){if(isAdmin())stokDuzenleSayfasiniAc()};
+document.getElementById("stokDuzenleCikBtn").onclick=anaSayfayaDon;
+document.getElementById("ajandaBtn").onclick=function(){if(isAdmin())ajandaSayfasiniAc()};
+document.getElementById("ajandaCikBtn").onclick=anaSayfayaDon;
 
-document.getElementById("stokGrubu").onchange=function(){let g=this.value;let us=document.getElementById("urunKodu");let usd=document.getElementById("urunSecim");let ta=document.getElementById("tabloAlan");if(!g){usd.style.display="none";ta.style.display="none";ta.innerHTML="";return}usd.style.display="block";us.innerHTML="";let sl=g==="HRD"?tumStoklariGetir():(urunler[g]||[]);sl.forEach(u=>{let o=document.createElement("option");o.value=u;o.textContent=dotTemizle(u)+" - "+getStokIsmi(u);us.appendChild(o)});ta.style.display="none";ta.innerHTML=""};
-document.getElementById("urunKodu").onchange=function(){let sec=Array.from(this.selectedOptions).map(o=>o.value);let ta=document.getElementById("tabloAlan");if(sec.length===0){ta.style.display="none";ta.innerHTML="";return}let h='<table><thead><tr><th>Stok Kodu</th><th>Stok İsmi</th><th>Miktar</th><th>1 Plaka (kg)</th><th>Toplam Kg</th><th>Açıklama</th></tr></thead><tbody>';sec.forEach((u,idx)=>{let w=getPlakaWeight(u);let isim=getStokIsmi(u);let rid="r"+Date.now()+idx;h+='<tr id="'+rid+'"><td>'+dotTemizle(u)+'</td><td style="text-align:left;font-size:11px">'+isim+'</td>';h+='<td><input type="number" class="small-input" data-weight="'+w+'" data-rid="'+rid+'" value="1" min="0" step="0.01"></td>';h+='<td><input type="text" class="plaka-input" value="'+formatNumberDisplay(w)+'" readonly></td>';h+='<td><input type="text" class="toplam-input" value="'+formatNumberDisplay(w)+'" readonly></td>';h+='<td><input type="text" class="aciklama-input" placeholder="Açıklama" style="width:120px"></td></tr>'});h+='</tbody></table>';ta.innerHTML=h;ta.style.display="block";document.querySelectorAll('.small-input').forEach(inp=>{inp.oninput=function(){let m=parseNumber(this.value);let w=parseNumber(this.dataset.weight);let satir=document.getElementById(this.dataset.rid);if(satir){let t=satir.querySelector('.toplam-input');if(t)t.value=formatNumberDisplay(m*w)}}})};
+function stokDuzenleSayfasiniAc(){
+    document.getElementById("yeniGirisAlan").classList.add("hidden");
+    document.getElementById("oncekiGirislerAlan").classList.add("hidden");
+    document.getElementById("ajandaAlan").classList.add("hidden");
+    document.getElementById("stokDuzenleAlan").classList.remove("hidden");
+    stokListesiniGoster();
+}
 
-function kaydetVeGecmiseGit(yonlendir){let satirlar=document.querySelectorAll("#tabloAlan tbody tr");if(satirlar.length===0){document.getElementById("mesaj").innerHTML="<span class='error'>Lütfen en az bir ürün seçin!</span>";return false}let grup=document.getElementById("stokGrubu").value;if(!grup){document.getElementById("mesaj").innerHTML="<span class='error'>Lütfen stok grubu seçin!</span>";return false}let ms=getSiraNo();let kalemler=[];satirlar.forEach(tr=>{let sk=tr.cells[0]?tr.cells[0].textContent.trim():"";let si=tr.cells[1]?tr.cells[1].textContent.trim():"";let mi=tr.querySelector('.small-input');let pi=tr.querySelector('.plaka-input');let ti=tr.querySelector('.toplam-input');let ai=tr.querySelector('.aciklama-input');kalemler.push({"Stok Kodu":sk,"Stok İsmi":si,"Miktar":formatNumber(mi?mi.value:"0"),"1 Plaka (kg)":formatNumber(pi?pi.value:"0"),"Toplam Kg":formatNumber(ti?ti.value:"0"),"Açıklama":ai?ai.value:""})});let simdi=new Date();let evrak={"Seri No":SERI_NO,"Sıra No":ms,"Grup":grup,"Olusturan":aktifKullanici,"Duzenleyen":"","Duzenlendi":false,"DuzenlemeTarihi":"","Kayıt Tarihi":simdi.toLocaleDateString('tr-TR'),"Kayıt Saati":simdi.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),"Kalemler":kalemler};gecmisVeriler.push(evrak);siranoArtir();saveToFirebase();document.getElementById("mesaj").innerHTML="<span class='success'>✅ Evrak kaydedildi! Sıra No: "+ms+"</span>";document.getElementById("tabloAlan").innerHTML="";document.getElementById("tabloAlan").style.display="none";document.getElementById("urunKodu").selectedIndex=-1;document.getElementById("stokGrubu").selectedIndex=0;document.getElementById("urunSecim").style.display="none";if(yonlendir)setTimeout(()=>gecmisListesiniGoster(),800);return true}
-document.getElementById("kaydetBtn").onclick=()=>kaydetVeGecmiseGit(false);document.getElementById("kayitSonrasiGecmisBtn").onclick=()=>kaydetVeGecmiseGit(true);
+// ==================== YENİ KAYIT ====================
+document.getElementById("stokGrubu").onchange=function(){
+    let g=this.value;let us=document.getElementById("urunKodu");let usd=document.getElementById("urunSecim");let ta=document.getElementById("tabloAlan");
+    if(!g){usd.style.display="none";ta.style.display="none";ta.innerHTML="";return}
+    usd.style.display="block";us.innerHTML="";
+    let sl=g==="HRD"?tumStoklariGetir():(urunler[g]||[]);
+    sl.forEach(u=>{let o=document.createElement("option");o.value=u;o.textContent=dotTemizle(u)+" - "+getStokIsmi(u);us.appendChild(o)});
+    ta.style.display="none";ta.innerHTML="";
+};
+document.getElementById("urunKodu").onchange=function(){
+    let sec=Array.from(this.selectedOptions).map(o=>o.value);let ta=document.getElementById("tabloAlan");
+    if(sec.length===0){ta.style.display="none";ta.innerHTML="";return}
+    let h='<table><thead><tr><th>Stok Kodu</th><th>Stok İsmi</th><th>Miktar</th><th>1 Plaka (kg)</th><th>Toplam Kg</th><th>Açıklama</th></tr></thead><tbody>';
+    sec.forEach((u,idx)=>{let w=getPlakaWeight(u);let isim=getStokIsmi(u);let rid="r"+Date.now()+idx;
+        h+='<tr id="'+rid+'"><td>'+dotTemizle(u)+'</td><td style="text-align:left;font-size:11px">'+isim+'</td>';
+        h+='<td><input type="number" class="small-input" data-weight="'+w+'" data-rid="'+rid+'" value="1" min="0" step="0.01"></td>';
+        h+='<td><input type="text" class="plaka-input" value="'+formatNumberDisplay(w)+'" readonly></td>';
+        h+='<td><input type="text" class="toplam-input" value="'+formatNumberDisplay(w)+'" readonly></td>';
+        h+='<td><input type="text" class="aciklama-input" placeholder="Açıklama" style="width:120px"></td></tr>';
+    });
+    h+='</tbody></table>';ta.innerHTML=h;ta.style.display="block";
+    document.querySelectorAll('.small-input').forEach(inp=>{
+        inp.oninput=function(){let m=parseNumber(this.value);let w=parseNumber(this.dataset.weight);let satir=document.getElementById(this.dataset.rid);if(satir){let t=satir.querySelector('.toplam-input');if(t)t.value=formatNumberDisplay(m*w)}}
+    });
+};
 
-function gecmisListesiniGoster(){document.getElementById("yeniGirisAlan").classList.add("hidden");document.getElementById("oncekiGirislerAlan").classList.remove("hidden");document.getElementById("stokDuzenleAlan").classList.add("hidden");document.getElementById("ajandaAlan").classList.add("hidden");gecmisVeriler=gecmisVeriler.filter(e=>!silinenSiralar.includes(e["Sıra No"]));filteredVeriler=[...gecmisVeriler];currentPage=1;seciliEvrakIndisleri.clear();seciliOzetBaslangic="";seciliOzetBitis="";ozetSonuc=[];document.getElementById("ozetBaslangicTarih").value="";document.getElementById("ozetBitisTarih").value="";document.getElementById("ozetAlani").style.display="none";document.getElementById("ozetExcelBtn").style.display="none";excelButonlariniKontrol();gecmisYukle()}
-function filtreUygula(){let s=document.getElementById("filtre_seri").value.toLowerCase();let si=document.getElementById("filtre_sira").value.toLowerCase();let g=document.getElementById("filtre_grup").value;let ft=document.getElementById("filtre_tarih").value;filteredVeriler=gecmisVeriler.filter(r=>{if(s&&!r["Seri No"].toString().toLowerCase().includes(s))return false;if(si&&!r["Sıra No"].toString().toLowerCase().includes(si))return false;if(g&&r["Grup"]!==g)return false;if(ft){let ff=new Date(ft).toLocaleDateString('tr-TR');if((r["Kayıt Tarihi"]||"")!==ff)return false}return true})}
-function sortTable(col){if(sortColumn===col)sortDirection=sortDirection==='asc'?'desc':'asc';else{sortColumn=col;sortDirection='asc'}currentPage=1;gecmisYukle()}window.sortTable=sortTable;
+function kaydetVeGecmiseGit(yonlendir){
+    let satirlar=document.querySelectorAll("#tabloAlan tbody tr");
+    if(satirlar.length===0){document.getElementById("mesaj").innerHTML="<span class='error'>Lütfen en az bir ürün seçin!</span>";return false}
+    let grup=document.getElementById("stokGrubu").value;
+    if(!grup){document.getElementById("mesaj").innerHTML="<span class='error'>Lütfen stok grubu seçin!</span>";return false}
+    let ms=getSiraNo();let kalemler=[];
+    satirlar.forEach(tr=>{
+        let sk=tr.cells[0]?tr.cells[0].textContent.trim():"";
+        let si=tr.cells[1]?tr.cells[1].textContent.trim():"";
+        let mi=tr.querySelector('.small-input');let pi=tr.querySelector('.plaka-input');let ti=tr.querySelector('.toplam-input');let ai=tr.querySelector('.aciklama-input');
+        kalemler.push({"Stok Kodu":sk,"Stok İsmi":si,"Miktar":formatNumber(mi?mi.value:"0"),"1 Plaka (kg)":formatNumber(pi?pi.value:"0"),"Toplam Kg":formatNumber(ti?ti.value:"0"),"Açıklama":ai?ai.value:""});
+    });
+    let simdi=new Date();
+    let evrak={"Seri No":SERI_NO,"Sıra No":ms,"Grup":grup,"Olusturan":aktifKullanici,"Duzenleyen":"","Duzenlendi":false,"DuzenlemeTarihi":"","Kayıt Tarihi":simdi.toLocaleDateString('tr-TR'),"Kayıt Saati":simdi.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),"Kalemler":kalemler};
+    gecmisVeriler.push(evrak);siranoArtir();saveToFirebase();
+    document.getElementById("mesaj").innerHTML="<span class='success'>✅ Evrak kaydedildi! Sıra No: "+ms+"</span>";
+    document.getElementById("tabloAlan").innerHTML="";document.getElementById("tabloAlan").style.display="none";
+    document.getElementById("urunKodu").selectedIndex=-1;document.getElementById("stokGrubu").selectedIndex=0;document.getElementById("urunSecim").style.display="none";
+    if(yonlendir)setTimeout(()=>gecmisListesiniGoster(),800);
+    return true;
+}
+document.getElementById("kaydetBtn").onclick=()=>kaydetVeGecmiseGit(false);
+document.getElementById("kayitSonrasiGecmisBtn").onclick=()=>kaydetVeGecmiseGit(true);
+
+// ==================== GEÇMİŞ LİSTESİ ====================
+function gecmisListesiniGoster(){
+    document.getElementById("yeniGirisAlan").classList.add("hidden");
+    document.getElementById("oncekiGirislerAlan").classList.remove("hidden");
+    document.getElementById("stokDuzenleAlan").classList.add("hidden");
+    document.getElementById("ajandaAlan").classList.add("hidden");
+    gecmisVeriler=gecmisVeriler.filter(e=>!silinenSiralar.includes(e["Sıra No"]));
+    filteredVeriler=[...gecmisVeriler];currentPage=1;seciliEvrakIndisleri.clear();
+    seciliOzetBaslangic="";seciliOzetBitis="";ozetSonuc=[];
+    document.getElementById("ozetBaslangicTarih").value="";document.getElementById("ozetBitisTarih").value="";
+    document.getElementById("ozetAlani").style.display="none";document.getElementById("ozetExcelBtn").style.display="none";
+    excelButonlariniKontrol();gecmisYukle();
+}
+function filtreUygula(){
+    let s=document.getElementById("filtre_seri").value.toLowerCase();
+    let si=document.getElementById("filtre_sira").value.toLowerCase();
+    let g=document.getElementById("filtre_grup").value;
+    let ft=document.getElementById("filtre_tarih").value;
+    filteredVeriler=gecmisVeriler.filter(r=>{
+        if(s&&!r["Seri No"].toString().toLowerCase().includes(s))return false;
+        if(si&&!r["Sıra No"].toString().toLowerCase().includes(si))return false;
+        if(g&&r["Grup"]!==g)return false;
+        if(ft){let ff=new Date(ft).toLocaleDateString('tr-TR');if((r["Kayıt Tarihi"]||"")!==ff)return false}
+        return true;
+    });
+}
+function sortTable(col){
+    if(sortColumn===col)sortDirection=sortDirection==='asc'?'desc':'asc';
+    else{sortColumn=col;sortDirection='asc'}
+    currentPage=1;gecmisYukle();
+}
+window.sortTable=sortTable;
 function getSortArrow(col){if(sortColumn===col)return sortDirection==='asc'?' ▲':' ▼';return' ⇅'}
-function gecmisYukle(){let c=document.getElementById("gecmisTablosu");let ks=document.getElementById("kayitSayisi");if(gecmisVeriler.length===0){c.innerHTML="<p style='padding:30px;text-align:center;color:#999'>Henüz SAC4 kaydı bulunmuyor.</p>";ks.textContent="Toplam: 0 evrak";document.getElementById("paginationContainer").innerHTML="";document.getElementById("seciliSayi").textContent="0";return}filtreUygula();if(sortColumn){filteredVeriler.sort((a,b)=>{let va,vb;switch(sortColumn){case'seri':va=a["Seri No"]||"";vb=b["Seri No"]||"";break;case'sira':va=a["Sıra No"]||0;vb=b["Sıra No"]||0;break;case'grup':va=a["Grup"]||"";vb=b["Grup"]||"";break;case'tarih':va=a["Kayıt Tarihi"]||"";vb=b["Kayıt Tarihi"]||"";break;default:return 0}if(va<vb)return sortDirection==='asc'?-1:1;if(va>vb)return sortDirection==='asc'?1:-1;return 0})}ks.textContent="SAC4 Evrakları: "+filteredVeriler.length;let tp=Math.ceil(filteredVeriler.length/pageSize);if(currentPage>tp&&tp>0)currentPage=tp;if(currentPage<1)currentPage=1;let pd=filteredVeriler.slice((currentPage-1)*pageSize,currentPage*pageSize);let adminYetki=isAdmin();let h='<table><thead><tr>';if(adminYetki)h+='<th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>';h+='<th class="sortable" onclick="sortTable(\'seri\')">Seri No'+getSortArrow('seri')+'</th>';h+='<th class="sortable" onclick="sortTable(\'sira\')">Sıra No'+getSortArrow('sira')+'</th>';h+='<th class="sortable" onclick="sortTable(\'grup\')">Grup'+getSortArrow('grup')+'</th>';h+='<th>Oluşturan</th><th class="sortable" onclick="sortTable(\'tarih\')">Kayıt Tarihi'+getSortArrow('tarih')+'</th>';h+='<th>Kayıt Saati</th><th>İşlem</th></tr></thead><tbody>';pd.forEach(r=>{let gi=gecmisVeriler.indexOf(r);let ch=seciliEvrakIndisleri.has(gi)?'checked':'';let kl=evrakAktarildiMi(r);h+='<tr class="'+(kl?'kilitli':'')+'">';if(adminYetki)h+='<td><input type="checkbox" class="evrak-checkbox" data-idx="'+gi+'" '+ch+'></td>';h+='<td>'+r["Seri No"]+'</td><td>'+r["Sıra No"]+'</td><td>'+r["Grup"]+'</td><td>'+(r["Olusturan"]||"")+'</td>';h+='<td>'+(r["Kayıt Tarihi"]||"")+'</td><td>'+(r["Kayıt Saati"]||"")+'</td>';h+='<td><button class="btn btn-info btn-sm" onclick="detayGoster('+gi+')">📄 Detay</button> ';if(adminYetki)h+='<button class="btn btn-danger btn-sm" onclick="evrakSil('+gi+')">🗑️</button>';h+='</td></tr>'});h+='</tbody></table>';c.innerHTML=h;if(adminYetki){document.querySelectorAll('.evrak-checkbox').forEach(cb=>{cb.onchange=function(){let ix=parseInt(this.dataset.idx);if(this.checked)seciliEvrakIndisleri.add(ix);else seciliEvrakIndisleri.delete(ix);document.getElementById("seciliSayi").textContent=seciliEvrakIndisleri.size}});let sac=document.getElementById("selectAllCheckbox");if(sac)sac.onchange=function(){document.querySelectorAll('.evrak-checkbox').forEach(cb=>{cb.checked=this.checked;if(this.checked)seciliEvrakIndisleri.add(parseInt(cb.dataset.idx));else seciliEvrakIndisleri.delete(parseInt(cb.dataset.idx))});document.getElementById("seciliSayi").textContent=seciliEvrakIndisleri.size}}document.getElementById("seciliSayi").textContent=seciliEvrakIndisleri.size;let ph="";if(tp>1){ph+='<button onclick="sayfaDegistir(1)" '+(currentPage===1?'disabled':'')+'>⏮</button>';ph+='<button onclick="sayfaDegistir('+(currentPage-1)+')" '+(currentPage===1?'disabled':'')+'>◀</button>';ph+='<span style="padding:6px 12px">Sayfa '+currentPage+'/'+tp+'</span>';ph+='<button onclick="sayfaDegistir('+(currentPage+1)+')" '+(currentPage===tp?'disabled':'')+'>▶</button>';ph+='<button onclick="sayfaDegistir('+tp+')" '+(currentPage===tp?'disabled':'')+'>⏭</button>'}document.getElementById("paginationContainer").innerHTML=ph}window.sayfaDegistir=function(p){currentPage=p;gecmisYukle()};
-document.getElementById("filtreUygulaBtn").onclick=()=>{currentPage=1;seciliEvrakIndisleri.clear();gecmisYukle()};
-document.getElementById("filtreTemizleBtn").onclick=()=>{document.getElementById("filtre_seri").value="";document.getElementById("filtre_sira").value="";document.getElementById("filtre_grup").value="";document.getElementById("filtre_tarih").value="";currentPage=1;seciliEvrakIndisleri.clear();gecmisYukle()};
 
-// ==================== ÖZET TABLO (TARİH ARALIĞI) ====================
+function gecmisYukle(){
+    let c=document.getElementById("gecmisTablosu");let ks=document.getElementById("kayitSayisi");
+    if(gecmisVeriler.length===0){c.innerHTML="<p style='padding:30px;text-align:center;color:#999'>Henüz SAC4 kaydı bulunmuyor.</p>";ks.textContent="Toplam: 0 evrak";document.getElementById("paginationContainer").innerHTML="";document.getElementById("seciliSayi").textContent="0";return}
+    filtreUygula();
+    if(sortColumn){
+        filteredVeriler.sort((a,b)=>{
+            let va,vb;
+            switch(sortColumn){
+                case'seri':va=a["Seri No"]||"";vb=b["Seri No"]||"";break;
+                case'sira':va=a["Sıra No"]||0;vb=b["Sıra No"]||0;break;
+                case'grup':va=a["Grup"]||"";vb=b["Grup"]||"";break;
+                case'tarih':va=a["Kayıt Tarihi"]||"";vb=b["Kayıt Tarihi"]||"";break;
+                default:return 0;
+            }
+            if(va<vb)return sortDirection==='asc'?-1:1;if(va>vb)return sortDirection==='asc'?1:-1;return 0;
+        });
+    }
+    ks.textContent="SAC4 Evrakları: "+filteredVeriler.length;
+    let tp=Math.ceil(filteredVeriler.length/pageSize);
+    if(currentPage>tp&&tp>0)currentPage=tp;if(currentPage<1)currentPage=1;
+    let pd=filteredVeriler.slice((currentPage-1)*pageSize,currentPage*pageSize);
+    let adminYetki=isAdmin();
+    let h='<table><thead><tr>';
+    if(adminYetki)h+='<th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>';
+    h+='<th class="sortable" onclick="sortTable(\'seri\')">Seri No'+getSortArrow('seri')+'</th>';
+    h+='<th class="sortable" onclick="sortTable(\'sira\')">Sıra No'+getSortArrow('sira')+'</th>';
+    h+='<th class="sortable" onclick="sortTable(\'grup\')">Grup'+getSortArrow('grup')+'</th>';
+    h+='<th>Oluşturan</th><th class="sortable" onclick="sortTable(\'tarih\')">Kayıt Tarihi'+getSortArrow('tarih')+'</th>';
+    h+='<th>Kayıt Saati</th><th>İşlem</th></tr></thead><tbody>';
+    pd.forEach(r=>{
+        let gi=gecmisVeriler.indexOf(r);let ch=seciliEvrakIndisleri.has(gi)?'checked':'';let kl=evrakAktarildiMi(r);
+        h+='<tr class="'+(kl?'kilitli':'')+'">';
+        if(adminYetki)h+='<td><input type="checkbox" class="evrak-checkbox" data-idx="'+gi+'" '+ch+'></td>';
+        h+='<td>'+r["Seri No"]+'</td><td>'+r["Sıra No"]+'</td><td>'+r["Grup"]+'</td><td>'+(r["Olusturan"]||"")+'</td>';
+        h+='<td>'+(r["Kayıt Tarihi"]||"")+'</td><td>'+(r["Kayıt Saati"]||"")+'</td>';
+        h+='<td><button class="btn btn-info btn-sm" onclick="detayGoster('+gi+')">📄 Detay</button> ';
+        if(adminYetki)h+='<button class="btn btn-danger btn-sm" onclick="evrakSil('+gi+')">🗑️</button>';
+        h+='</td></tr>';
+    });
+    h+='</tbody></table>';c.innerHTML=h;
+    if(adminYetki){
+        document.querySelectorAll('.evrak-checkbox').forEach(cb=>{
+            cb.onchange=function(){let ix=parseInt(this.dataset.idx);if(this.checked)seciliEvrakIndisleri.add(ix);else seciliEvrakIndisleri.delete(ix);document.getElementById("seciliSayi").textContent=seciliEvrakIndisleri.size}
+        });
+        let sac=document.getElementById("selectAllCheckbox");
+        if(sac)sac.onchange=function(){
+            document.querySelectorAll('.evrak-checkbox').forEach(cb=>{cb.checked=this.checked;if(this.checked)seciliEvrakIndisleri.add(parseInt(cb.dataset.idx));else seciliEvrakIndisleri.delete(parseInt(cb.dataset.idx))});
+            document.getElementById("seciliSayi").textContent=seciliEvrakIndisleri.size;
+        };
+    }
+    document.getElementById("seciliSayi").textContent=seciliEvrakIndisleri.size;
+    let ph="";
+    if(tp>1){
+        ph+='<button onclick="sayfaDegistir(1)" '+(currentPage===1?'disabled':'')+'>⏮</button>';
+        ph+='<button onclick="sayfaDegistir('+(currentPage-1)+')" '+(currentPage===1?'disabled':'')+'>◀</button>';
+        ph+='<span style="padding:6px 12px">Sayfa '+currentPage+'/'+tp+'</span>';
+        ph+='<button onclick="sayfaDegistir('+(currentPage+1)+')" '+(currentPage===tp?'disabled':'')+'>▶</button>';
+        ph+='<button onclick="sayfaDegistir('+tp+')" '+(currentPage===tp?'disabled':'')+'>⏭</button>';
+    }
+    document.getElementById("paginationContainer").innerHTML=ph;
+}
+window.sayfaDegistir=function(p){currentPage=p;gecmisYukle()};
+document.getElementById("filtreUygulaBtn").onclick=()=>{currentPage=1;seciliEvrakIndisleri.clear();gecmisYukle()};
+document.getElementById("filtreTemizleBtn").onclick=()=>{
+    document.getElementById("filtre_seri").value="";document.getElementById("filtre_sira").value="";
+    document.getElementById("filtre_grup").value="";document.getElementById("filtre_tarih").value="";
+    currentPage=1;seciliEvrakIndisleri.clear();gecmisYukle();
+};
+
+// ==================== ÖZET TABLO ====================
 document.getElementById("ozetGosterBtn").onclick=function(){
     seciliOzetBaslangic=document.getElementById("ozetBaslangicTarih").value;
     seciliOzetBitis=document.getElementById("ozetBitisTarih").value;
@@ -250,8 +604,7 @@ document.getElementById("ozetTemizleBtn").onclick=function(){
 function ozetiGuncelle(){
     let oa=document.getElementById("ozetAlani");let oi=document.getElementById("ozetIcerik");
     if(!seciliOzetBaslangic||!seciliOzetBitis){oa.style.display="none";return}
-  let bas=new Date(seciliOzetBaslangic+"T00:00:00");
-let bit=new Date(seciliOzetBitis+"T23:59:59");
+    let bas=new Date(seciliOzetBaslangic+"T00:00:00");let bit=new Date(seciliOzetBitis+"T23:59:59");
     ozetSonuc=gecmisVeriler.filter(e=>{let kt=e["Kayıt Tarihi"];if(!kt)return false;let parts=kt.split('.');if(parts.length!==3)return false;let trh=new Date(parts[2],parts[1]-1,parts[0]);return trh>=bas&&trh<=bit});
     if(ozetSonuc.length===0){oa.style.display="block";oi.innerHTML='<div class="ozet-item"><div class="ozet-label">📦 Seçili Aralık</div><div class="ozet-deger">Kayıt Yok</div></div>';document.getElementById("ozetExcelBtn").style.display="none";return}
     oa.style.display="block";document.getElementById("ozetExcelBtn").style.display="inline-block";
@@ -267,40 +620,241 @@ document.getElementById("ozetExcelBtn").onclick=function(){
     excelHtml+='</table></body></html>';let blob=new Blob([excelHtml],{type:'application/vnd.ms-excel;charset=utf-8'});let link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download="SAC4_Ozet_"+seciliOzetBaslangic+"_"+seciliOzetBitis+".xls";link.click();URL.revokeObjectURL(link.href);
 };
 
-document.getElementById("seciliExceleAktarBtn").onclick=function(){if(!isAdmin()){alert("Bu işlem sadece Admin tarafından yapılabilir!");return}if(seciliEvrakIndisleri.size===0){alert("Lütfen evrak seçin!");return}let secilen=[];seciliEvrakIndisleri.forEach(ix=>{if(gecmisVeriler[ix])secilen.push(gecmisVeriler[ix])});secilen.forEach(e=>{if(!aktarilanEvraklar.includes(e["Sıra No"]))aktarilanEvraklar.push(e["Sıra No"])});syncData();let excelHtml='<html><head><meta charset="UTF-8"><style>th{background:#2c3e50;color:white;padding:8px}td{padding:8px;border:1px solid black}</style></head><body><table border="1"><tr><th>Seri No</th><th>Sıra No</th><th>Grup</th><th>Oluşturan</th><th>Kayıt Tarihi</th><th>Kayıt Saati</th><th>Stok Kodu</th><th>Stok İsmi</th><th>Miktar</th><th>1 Plaka</th><th>Toplam Kg</th><th>Açıklama</th></tr>';secilen.forEach(e=>{(e.Kalemler||[]).forEach(k=>{excelHtml+='<tr><td>'+e["Seri No"]+'</td><td>'+e["Sıra No"]+'</td><td>'+e["Grup"]+'</td><td>'+(e["Olusturan"]||"")+'</td><td>'+(e["Kayıt Tarihi"]||"")+'</td><td>'+(e["Kayıt Saati"]||"")+'</td><td>'+dotTemizle(k["Stok Kodu"]||"")+'</td><td>'+(k["Stok İsmi"]||"")+'</td><td>'+formatNumberDisplay(k["Miktar"])+'</td><td>'+formatNumberDisplay(k["1 Plaka (kg)"])+'</td><td>'+formatNumberDisplay(k["Toplam Kg"])+'</td><td>'+(k["Açıklama"]||"")+'</td></tr>'})});excelHtml+='</table></body></html>';let blob=new Blob([excelHtml],{type:'application/vnd.ms-excel;charset=utf-8'});let link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download="SAC4_kesim_"+new Date().toISOString().slice(0,10)+".xls";link.click();URL.revokeObjectURL(link.href);filteredVeriler=[...gecmisVeriler];gecmisYukle();alert(secilen.length+" evrak Excel'e aktarıldı! ✅")};
+// ==================== EXCEL AKTAR ====================
+document.getElementById("seciliExceleAktarBtn").onclick=function(){
+    if(!isAdmin()){alert("Bu işlem sadece Admin tarafından yapılabilir!");return}
+    if(seciliEvrakIndisleri.size===0){alert("Lütfen evrak seçin!");return}
+    let secilen=[];seciliEvrakIndisleri.forEach(ix=>{if(gecmisVeriler[ix])secilen.push(gecmisVeriler[ix])});
+    secilen.forEach(e=>{if(!aktarilanEvraklar.includes(e["Sıra No"]))aktarilanEvraklar.push(e["Sıra No"])});
+    syncData();
+    let excelHtml='<html><head><meta charset="UTF-8"><style>th{background:#2c3e50;color:white;padding:8px}td{padding:8px;border:1px solid black}</style></head><body><table border="1"><tr><th>Seri No</th><th>Sıra No</th><th>Grup</th><th>Oluşturan</th><th>Kayıt Tarihi</th><th>Kayıt Saati</th><th>Stok Kodu</th><th>Stok İsmi</th><th>Miktar</th><th>1 Plaka</th><th>Toplam Kg</th><th>Açıklama</th></tr>';
+    secilen.forEach(e=>{(e.Kalemler||[]).forEach(k=>{excelHtml+='<tr><td>'+e["Seri No"]+'</td><td>'+e["Sıra No"]+'</td><td>'+e["Grup"]+'</td><td>'+(e["Olusturan"]||"")+'</td><td>'+(e["Kayıt Tarihi"]||"")+'</td><td>'+(e["Kayıt Saati"]||"")+'</td><td>'+dotTemizle(k["Stok Kodu"]||"")+'</td><td>'+(k["Stok İsmi"]||"")+'</td><td>'+formatNumberDisplay(k["Miktar"])+'</td><td>'+formatNumberDisplay(k["1 Plaka (kg)"])+'</td><td>'+formatNumberDisplay(k["Toplam Kg"])+'</td><td>'+(k["Açıklama"]||"")+'</td></tr>'})});
+    excelHtml+='</table></body></html>';let blob=new Blob([excelHtml],{type:'application/vnd.ms-excel;charset=utf-8'});let link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download="SAC4_kesim_"+new Date().toISOString().slice(0,10)+".xls";link.click();URL.revokeObjectURL(link.href);
+    filteredVeriler=[...gecmisVeriler];gecmisYukle();
+    alert(secilen.length+" evrak Excel'e aktarıldı! ✅");
+};
 document.getElementById("tumunuSecBtn").onclick=function(){if(!isAdmin())return;document.querySelectorAll('.evrak-checkbox').forEach(cb=>{cb.checked=true;seciliEvrakIndisleri.add(parseInt(cb.dataset.idx))});document.getElementById("seciliSayi").textContent=seciliEvrakIndisleri.size};
 document.getElementById("secimiTemizleBtn").onclick=function(){if(!isAdmin())return;document.querySelectorAll('.evrak-checkbox').forEach(cb=>{cb.checked=false;seciliEvrakIndisleri.delete(parseInt(cb.dataset.idx))});document.getElementById("seciliSayi").textContent="0"};
 
-function stokSecenekleriniOlustur(grup,secili){let o='<option value="">-- Stok Seçin --</option>';let sl=grup==="HRD"?tumStoklariGetir():(urunler[grup]||[]);sl.forEach(s=>{o+='<option value="'+s+'" '+(s===secili?'selected':'')+'>'+dotTemizle(s)+' - '+getStokIsmi(s)+'</option>'});return o}
-window.detayGoster=function(idx){let r=gecmisVeriler[idx];if(!r)return;detayEditingIdx=idx;let kl=evrakAktarildiMi(r);let adminYetki=isAdmin();document.getElementById("detayKilitBilgi").innerHTML=(!adminYetki)?'<div class="kilitli-bilgi"><span>🔒</span> Düzenleme ve silme işlemleri sadece Admin tarafından yapılabilir.</div>':(kl?'<div class="kilitli-bilgi"><span>🔒</span> Bu evrak Excel\'e aktarılmıştır.</div>':'');let ic='<div class="detay-row"><span class="detay-label">Seri No:</span><span class="detay-value">'+r["Seri No"]+'</span></div>';ic+='<div class="detay-row"><span class="detay-label">Sıra No:</span><span class="detay-value">'+r["Sıra No"]+'</span></div>';ic+='<div class="detay-row"><span class="detay-label">Grup:</span><span class="detay-value">'+r["Grup"]+'</span></div>';ic+='<div class="detay-row"><span class="detay-label">Oluşturan:</span><span class="detay-value">'+(r["Olusturan"]||"")+'</span></div>';ic+='<div class="detay-row"><span class="detay-label">Kayıt Tarihi:</span><span class="detay-value">'+(r["Kayıt Tarihi"]||"")+'</span></div>';ic+='<div class="detay-row"><span class="detay-label">Kayıt Saati:</span><span class="detay-value">'+(r["Kayıt Saati"]||"")+'</span></div>';ic+='<div class="detay-row"><span class="detay-label">Durum:</span><span class="detay-value">'+getDurum(r)+'</span></div>';ic+='<hr><h3>📦 Kalemler</h3><table><thead><tr><th>Stok Kodu</th><th>Stok İsmi</th><th>Miktar</th><th>1 Plaka</th><th>Toplam Kg</th><th>Açıklama</th></tr></thead><tbody>';(r.Kalemler||[]).forEach(k=>{ic+='<tr><td>'+dotTemizle(k["Stok Kodu"])+'</td><td style="text-align:left">'+k["Stok İsmi"]+'</td><td>'+formatNumberDisplay(k["Miktar"])+'</td><td>'+formatNumberDisplay(k["1 Plaka (kg)"])+'</td><td>'+formatNumberDisplay(k["Toplam Kg"])+'</td><td>'+k["Açıklama"]+'</td></tr>'});ic+='</tbody></table>';document.getElementById("detayIcerik").innerHTML=ic;document.getElementById("detayDuzenlemeAlani").style.display="none";document.getElementById("detayDuzenleBtn").disabled=!adminYetki||kl;document.getElementById("detaySilBtn").disabled=!adminYetki||kl;document.getElementById("detayDuzenleBtn").classList.remove("hidden");document.getElementById("detayKaydetBtn").classList.add("hidden");document.getElementById("detayModal").style.display="block"};
-document.getElementById("detayDuzenleBtn").onclick=function(){if(!isAdmin()){alert("Bu işlem sadece Admin tarafından yapılabilir!");return}let r=gecmisVeriler[detayEditingIdx];if(!r||evrakAktarildiMi(r)){alert("Düzenleme yetkiniz yok!");return}duzenlemeModunuAc()};
-function duzenlemeModunuAc(){let r=gecmisVeriler[detayEditingIdx];let gs='<select id="editGrup" onchange="grupDegisinceStoklariGuncelle()">';["430","DKP","GALVANIZ","304","316","201","HRD"].forEach(g=>{gs+='<option value="'+g+'" '+(r["Grup"]===g?'selected':'')+'>'+g+'</option>'});gs+='</select>';let h='<div class="detay-edit-section"><h3>✏️ Evrak Düzenleme</h3><div class="form-group"><label>Grup:</label>'+gs+'</div>';h+='<div class="form-group"><label>Kalemler:</label><table class="edit-table"><thead><tr><th>Stok Kodu</th><th>Stok İsmi</th><th>Miktar</th><th>1 Plaka</th><th>Toplam Kg</th><th>Açıklama</th><th>İşlem</th></tr></thead><tbody id="editKalemlerTbody">';(r.Kalemler||[]).forEach(k=>{h+='<tr class="edit-kalem-row"><td><select class="stok-select kalem-stok-select" onchange="stokSecincePlakaGuncelle(this)">'+stokSecenekleriniOlustur(r["Grup"],k["Stok Kodu"])+'</select></td>';h+='<td class="stok-isim">'+getStokIsmi(k["Stok Kodu"])+'</td>';h+='<td><input type="number" class="miktar-input edit-miktar" value="'+formatNumberDisplay(k["Miktar"])+'" step="0.01" oninput="miktarDegisinceToplamGuncelle(this)"></td>';h+='<td><input type="text" class="plaka-display edit-plaka" value="'+formatNumberDisplay(k["1 Plaka (kg)"])+'" readonly></td>';h+='<td><input type="text" class="toplam-display edit-toplam" value="'+formatNumberDisplay(k["Toplam Kg"])+'" readonly></td>';h+='<td><input type="text" class="edit-aciklama" value="'+(k["Açıklama"]||"")+'"></td>';h+='<td><button class="kalem-sil-btn" onclick="this.closest(\'tr\').remove()">🗑️</button></td></tr>'});h+='</tbody></table><button class="kalem-ekle-btn" onclick="yeniKalemEkle()">➕ Yeni Kalem</button></div></div>';document.getElementById("detayDuzenlemeAlani").innerHTML=h;document.getElementById("detayDuzenlemeAlani").style.display="block";document.getElementById("detayDuzenleBtn").classList.add("hidden");document.getElementById("detayKaydetBtn").classList.remove("hidden")}
-window.grupDegisinceStoklariGuncelle=function(){let yg=document.getElementById("editGrup")?document.getElementById("editGrup").value:"";if(!yg)return;document.querySelectorAll('.kalem-stok-select').forEach(s=>{let md=s.value;s.innerHTML=stokSecenekleriniOlustur(yg,md)})};
-window.stokSecincePlakaGuncelle=function(se){let sk=se.value;let r=se.closest('tr');let p=getPlakaWeight(sk);r.querySelector('.edit-plaka').value=formatNumberDisplay(p);r.querySelector('.stok-isim').textContent=getStokIsmi(sk);let m=parseNumber(r.querySelector('.edit-miktar').value);r.querySelector('.edit-toplam').value=formatNumberDisplay(m*p)};
-window.miktarDegisinceToplamGuncelle=function(ie){let r=ie.closest('tr');let m=parseNumber(ie.value);let p=parseNumber(r.querySelector('.edit-plaka').value);r.querySelector('.edit-toplam').value=formatNumberDisplay(m*p)};
-window.yeniKalemEkle=function(){let tb=document.getElementById("editKalemlerTbody");let sg=document.getElementById("editGrup")?document.getElementById("editGrup").value:"430";let r=document.createElement("tr");r.className="edit-kalem-row";r.innerHTML='<td><select class="stok-select kalem-stok-select" onchange="stokSecincePlakaGuncelle(this)">'+stokSecenekleriniOlustur(sg)+'</select></td><td class="stok-isim"></td><td><input type="number" class="miktar-input edit-miktar" value="0" step="0.01" oninput="miktarDegisinceToplamGuncelle(this)"></td><td><input type="text" class="plaka-display edit-plaka" value="0" readonly></td><td><input type="text" class="toplam-display edit-toplam" value="0" readonly></td><td><input type="text" class="edit-aciklama" value=""></td><td><button class="kalem-sil-btn" onclick="this.closest(\'tr\').remove()">🗑️</button></td>';tb.appendChild(r)};
-document.getElementById("detayKaydetBtn").onclick=function(){if(!isAdmin()){alert("Bu işlem sadece Admin tarafından yapılabilir!");return}let r=gecmisVeriler[detayEditingIdx];if(!r||evrakAktarildiMi(r)){alert("Düzenleme yetkiniz yok!");return}let yg=document.getElementById("editGrup").value;let yk=[];document.querySelectorAll("#editKalemlerTbody .edit-kalem-row").forEach(row=>{let sk=row.querySelector('.kalem-stok-select').value;if(sk){yk.push({"Stok Kodu":sk,"Stok İsmi":getStokIsmi(sk),"Miktar":formatNumber(row.querySelector('.edit-miktar').value),"1 Plaka (kg)":formatNumber(row.querySelector('.edit-plaka').value),"Toplam Kg":formatNumber(row.querySelector('.edit-toplam').value),"Açıklama":row.querySelector('.edit-aciklama').value})}});if(yk.length===0){alert("En az bir kalem olmalı!");return}r["Grup"]=yg;r["Kalemler"]=yk;r["Duzenlendi"]=true;r["Duzenleyen"]=aktifKullanici;r["DuzenlemeTarihi"]=new Date().toLocaleString('tr-TR');saveToFirebase().then(()=>{alert("✅ Değişiklikler kaydedildi!");document.getElementById("detayModal").style.display="none";gecmisYukle()}).catch(err=>{alert("❌ Kayıt hatası!")})};
-document.getElementById("detaySilBtn").onclick=function(){if(!isAdmin()){alert("Bu işlem sadece Admin tarafından yapılabilir!");return}let r=gecmisVeriler[detayEditingIdx];if(!r||evrakAktarildiMi(r)){alert("Silme yetkiniz yok!");return}document.getElementById("detayModal").style.display="none";if(confirm("Bu evrak silinsin mi?"))evrakSilOnaylandi(detayEditingIdx)};
-window.evrakSil=function(idx){if(!isAdmin()){alert("Bu işlem sadece Admin tarafından yapılabilir!");return}let r=gecmisVeriler[idx];if(!r||evrakAktarildiMi(r)){alert("Bu evrak silinemez!");return}if(confirm("Bu evrak silinsin mi?"))evrakSilOnaylandi(idx)};
-function evrakSilOnaylandi(idx){let ss=gecmisVeriler[idx]["Sıra No"];gecmisVeriler.splice(idx,1);if(!silinenSiralar.includes(ss))silinenSiralar.push(ss);aktarilanEvraklar=aktarilanEvraklar.filter(s=>s!==ss);saveToFirebase();seciliEvrakIndisleri.clear();gecmisYukle()}
+// ==================== DETAY ====================
+function stokSecenekleriniOlustur(grup,secili){
+    let o='<option value="">-- Stok Seçin --</option>';
+    let sl=grup==="HRD"?tumStoklariGetir():(urunler[grup]||[]);
+    sl.forEach(s=>{o+='<option value="'+s+'" '+(s===secili?'selected':'')+'>'+dotTemizle(s)+' - '+getStokIsmi(s)+'</option>'});
+    return o;
+}
+window.detayGoster=function(idx){
+    let r=gecmisVeriler[idx];if(!r)return;detayEditingIdx=idx;
+    let kl=evrakAktarildiMi(r);let adminYetki=isAdmin();
+    document.getElementById("detayKilitBilgi").innerHTML=(!adminYetki)?'<div class="kilitli-bilgi"><span>🔒</span> Düzenleme ve silme işlemleri sadece Admin tarafından yapılabilir.</div>':(kl?'<div class="kilitli-bilgi"><span>🔒</span> Bu evrak Excel\'e aktarılmıştır.</div>':'');
+    let ic='<div class="detay-row"><span class="detay-label">Seri No:</span><span class="detay-value">'+r["Seri No"]+'</span></div>';
+    ic+='<div class="detay-row"><span class="detay-label">Sıra No:</span><span class="detay-value">'+r["Sıra No"]+'</span></div>';
+    ic+='<div class="detay-row"><span class="detay-label">Grup:</span><span class="detay-value">'+r["Grup"]+'</span></div>';
+    ic+='<div class="detay-row"><span class="detay-label">Oluşturan:</span><span class="detay-value">'+(r["Olusturan"]||"")+'</span></div>';
+    ic+='<div class="detay-row"><span class="detay-label">Kayıt Tarihi:</span><span class="detay-value">'+(r["Kayıt Tarihi"]||"")+'</span></div>';
+    ic+='<div class="detay-row"><span class="detay-label">Kayıt Saati:</span><span class="detay-value">'+(r["Kayıt Saati"]||"")+'</span></div>';
+    ic+='<div class="detay-row"><span class="detay-label">Durum:</span><span class="detay-value">'+getDurum(r)+'</span></div>';
+    ic+='<hr><h3>📦 Kalemler</h3><table><thead><tr><th>Stok Kodu</th><th>Stok İsmi</th><th>Miktar</th><th>1 Plaka</th><th>Toplam Kg</th><th>Açıklama</th></tr></thead><tbody>';
+    (r.Kalemler||[]).forEach(k=>{ic+='<tr><td>'+dotTemizle(k["Stok Kodu"])+'</td><td style="text-align:left">'+k["Stok İsmi"]+'</td><td>'+formatNumberDisplay(k["Miktar"])+'</td><td>'+formatNumberDisplay(k["1 Plaka (kg)"])+'</td><td>'+formatNumberDisplay(k["Toplam Kg"])+'</td><td>'+k["Açıklama"]+'</td></tr>'});
+    ic+='</tbody></table>';document.getElementById("detayIcerik").innerHTML=ic;
+    document.getElementById("detayDuzenlemeAlani").style.display="none";
+    document.getElementById("detayDuzenleBtn").disabled=!adminYetki||kl;
+    document.getElementById("detaySilBtn").disabled=!adminYetki||kl;
+    document.getElementById("detayDuzenleBtn").classList.remove("hidden");
+    document.getElementById("detayKaydetBtn").classList.add("hidden");
+    document.getElementById("detayModal").style.display="block";
+};
+document.getElementById("detayDuzenleBtn").onclick=function(){
+    if(!isAdmin()){alert("Bu işlem sadece Admin tarafından yapılabilir!");return}
+    let r=gecmisVeriler[detayEditingIdx];if(!r||evrakAktarildiMi(r)){alert("Düzenleme yetkiniz yok!");return}
+    duzenlemeModunuAc();
+};
+function duzenlemeModunuAc(){
+    let r=gecmisVeriler[detayEditingIdx];
+    let gs='<select id="editGrup" onchange="grupDegisinceStoklariGuncelle()">';
+    ["430","DKP","GALVANIZ","304","316","201","HRD"].forEach(g=>{gs+='<option value="'+g+'" '+(r["Grup"]===g?'selected':'')+'>'+g+'</option>'});gs+='</select>';
+    let h='<div class="detay-edit-section"><h3>✏️ Evrak Düzenleme</h3><div class="form-group"><label>Grup:</label>'+gs+'</div>';
+    h+='<div class="form-group"><label>Kalemler:</label><table class="edit-table"><thead><tr><th>Stok Kodu</th><th>Stok İsmi</th><th>Miktar</th><th>1 Plaka</th><th>Toplam Kg</th><th>Açıklama</th><th>İşlem</th></tr></thead><tbody id="editKalemlerTbody">';
+    (r.Kalemler||[]).forEach(k=>{
+        h+='<tr class="edit-kalem-row"><td><select class="stok-select kalem-stok-select" onchange="stokSecincePlakaGuncelle(this)">'+stokSecenekleriniOlustur(r["Grup"],k["Stok Kodu"])+'</select></td>';
+        h+='<td class="stok-isim">'+getStokIsmi(k["Stok Kodu"])+'</td>';
+        h+='<td><input type="number" class="miktar-input edit-miktar" value="'+formatNumberDisplay(k["Miktar"])+'" step="0.01" oninput="miktarDegisinceToplamGuncelle(this)"></td>';
+        h+='<td><input type="text" class="plaka-display edit-plaka" value="'+formatNumberDisplay(k["1 Plaka (kg)"])+'" readonly></td>';
+        h+='<td><input type="text" class="toplam-display edit-toplam" value="'+formatNumberDisplay(k["Toplam Kg"])+'" readonly></td>';
+        h+='<td><input type="text" class="edit-aciklama" value="'+(k["Açıklama"]||"")+'"></td>';
+        h+='<td><button class="kalem-sil-btn" onclick="this.closest(\'tr\').remove()">🗑️</button></td></tr>';
+    });
+    h+='</tbody></table><button class="kalem-ekle-btn" onclick="yeniKalemEkle()">➕ Yeni Kalem</button></div></div>';
+    document.getElementById("detayDuzenlemeAlani").innerHTML=h;
+    document.getElementById("detayDuzenlemeAlani").style.display="block";
+    document.getElementById("detayDuzenleBtn").classList.add("hidden");
+    document.getElementById("detayKaydetBtn").classList.remove("hidden");
+}
+window.grupDegisinceStoklariGuncelle=function(){
+    let yg=document.getElementById("editGrup")?document.getElementById("editGrup").value:"";
+    if(!yg)return;
+    document.querySelectorAll('.kalem-stok-select').forEach(s=>{let md=s.value;s.innerHTML=stokSecenekleriniOlustur(yg,md)});
+};
+window.stokSecincePlakaGuncelle=function(se){
+    let sk=se.value;let r=se.closest('tr');let p=getPlakaWeight(sk);
+    r.querySelector('.edit-plaka').value=formatNumberDisplay(p);
+    r.querySelector('.stok-isim').textContent=getStokIsmi(sk);
+    let m=parseNumber(r.querySelector('.edit-miktar').value);
+    r.querySelector('.edit-toplam').value=formatNumberDisplay(m*p);
+};
+window.miktarDegisinceToplamGuncelle=function(ie){
+    let r=ie.closest('tr');let m=parseNumber(ie.value);let p=parseNumber(r.querySelector('.edit-plaka').value);
+    r.querySelector('.edit-toplam').value=formatNumberDisplay(m*p);
+};
+window.yeniKalemEkle=function(){
+    let tb=document.getElementById("editKalemlerTbody");
+    let sg=document.getElementById("editGrup")?document.getElementById("editGrup").value:"430";
+    let r=document.createElement("tr");r.className="edit-kalem-row";
+    r.innerHTML='<td><select class="stok-select kalem-stok-select" onchange="stokSecincePlakaGuncelle(this)">'+stokSecenekleriniOlustur(sg)+'</select></td><td class="stok-isim"></td><td><input type="number" class="miktar-input edit-miktar" value="0" step="0.01" oninput="miktarDegisinceToplamGuncelle(this)"></td><td><input type="text" class="plaka-display edit-plaka" value="0" readonly></td><td><input type="text" class="toplam-display edit-toplam" value="0" readonly></td><td><input type="text" class="edit-aciklama" value=""></td><td><button class="kalem-sil-btn" onclick="this.closest(\'tr\').remove()">🗑️</button></td>';
+    tb.appendChild(r);
+};
+document.getElementById("detayKaydetBtn").onclick=function(){
+    if(!isAdmin()){alert("Bu işlem sadece Admin tarafından yapılabilir!");return}
+    let r=gecmisVeriler[detayEditingIdx];if(!r||evrakAktarildiMi(r)){alert("Düzenleme yetkiniz yok!");return}
+    let yg=document.getElementById("editGrup").value;let yk=[];
+    document.querySelectorAll("#editKalemlerTbody .edit-kalem-row").forEach(row=>{
+        let sk=row.querySelector('.kalem-stok-select').value;
+        if(sk){yk.push({"Stok Kodu":sk,"Stok İsmi":getStokIsmi(sk),"Miktar":formatNumber(row.querySelector('.edit-miktar').value),"1 Plaka (kg)":formatNumber(row.querySelector('.edit-plaka').value),"Toplam Kg":formatNumber(row.querySelector('.edit-toplam').value),"Açıklama":row.querySelector('.edit-aciklama').value})}
+    });
+    if(yk.length===0){alert("En az bir kalem olmalı!");return}
+    r["Grup"]=yg;r["Kalemler"]=yk;r["Duzenlendi"]=true;r["Duzenleyen"]=aktifKullanici;r["DuzenlemeTarihi"]=new Date().toLocaleString('tr-TR');
+    saveToFirebase().then(()=>{alert("✅ Değişiklikler kaydedildi!");document.getElementById("detayModal").style.display="none";gecmisYukle()}).catch(err=>{alert("❌ Kayıt hatası!")});
+};
+document.getElementById("detaySilBtn").onclick=function(){
+    if(!isAdmin()){alert("Bu işlem sadece Admin tarafından yapılabilir!");return}
+    let r=gecmisVeriler[detayEditingIdx];if(!r||evrakAktarildiMi(r)){alert("Silme yetkiniz yok!");return}
+    document.getElementById("detayModal").style.display="none";
+    if(confirm("Bu evrak silinsin mi?"))evrakSilOnaylandi(detayEditingIdx);
+};
+window.evrakSil=function(idx){
+    if(!isAdmin()){alert("Bu işlem sadece Admin tarafından yapılabilir!");return}
+    let r=gecmisVeriler[idx];if(!r||evrakAktarildiMi(r)){alert("Bu evrak silinemez!");return}
+    if(confirm("Bu evrak silinsin mi?"))evrakSilOnaylandi(idx);
+};
+function evrakSilOnaylandi(idx){
+    let ss=gecmisVeriler[idx]["Sıra No"];gecmisVeriler.splice(idx,1);
+    if(!silinenSiralar.includes(ss))silinenSiralar.push(ss);
+    aktarilanEvraklar=aktarilanEvraklar.filter(s=>s!==ss);
+    saveToFirebase();seciliEvrakIndisleri.clear();gecmisYukle();
+}
 
-document.getElementById("stokEkleBtn").onclick=function(){if(!isAdmin()){alert("Bu işlem sadece Admin tarafından yapılabilir!");return}let g=document.getElementById("yeniStokGrup").value;let k=document.getElementById("yeniStokKodu").value.trim();let i=document.getElementById("yeniStokIsmi").value.trim();let ps=document.getElementById("yeniStokPlaka").value.trim();if(!k||!i||!ps){document.getElementById("stokEkleMesaj").innerHTML="<span class='error'>Tüm alanları doldurun!</span>";return}if(stokBilgileri[k]){document.getElementById("stokEkleMesaj").innerHTML="<span class='error'>Bu stok kodu zaten mevcut!</span>";return}let p=parseNumber(ps);if(p<=0){document.getElementById("stokEkleMesaj").innerHTML="<span class='error'>Geçerli plaka kilosu girin!</span>";return}stokBilgileri[k]=i;plakaWeights[k]=p;stokGruplari[k]=g;urunleriGuncelle();syncData();document.getElementById("yeniStokKodu").value="";document.getElementById("yeniStokIsmi").value="";document.getElementById("yeniStokPlaka").value="";document.getElementById("stokEkleMesaj").innerHTML="<span class='success'>✅ Stok eklendi!</span>";stokListesiniGoster()};
+// ==================== STOK DÜZENLEME ====================
+document.getElementById("stokEkleBtn").onclick=function(){
+    if(!isAdmin()){alert("Bu işlem sadece Admin tarafından yapılabilir!");return}
+    let g=document.getElementById("yeniStokGrup").value;
+    let k=document.getElementById("yeniStokKodu").value.trim();
+    let i=document.getElementById("yeniStokIsmi").value.trim();
+    let ps=document.getElementById("yeniStokPlaka").value.trim();
+    if(!k||!i||!ps){document.getElementById("stokEkleMesaj").innerHTML="<span class='error'>Tüm alanları doldurun!</span>";return}
+    if(stokBilgileri[k]){document.getElementById("stokEkleMesaj").innerHTML="<span class='error'>Bu stok kodu zaten mevcut!</span>";return}
+    let p=parseNumber(ps);if(p<=0){document.getElementById("stokEkleMesaj").innerHTML="<span class='error'>Geçerli plaka kilosu girin!</span>";return}
+    stokBilgileri[k]=i;plakaWeights[k]=p;stokGruplari[k]=g;urunleriGuncelle();syncData();
+    document.getElementById("yeniStokKodu").value="";document.getElementById("yeniStokIsmi").value="";document.getElementById("yeniStokPlaka").value="";
+    document.getElementById("stokEkleMesaj").innerHTML="<span class='success'>✅ Stok eklendi!</span>";stokListesiniGoster();
+};
 document.getElementById("stokArama").oninput=function(){stokListesiniGoster(this.value)};
-function stokListesiniGoster(arama){let c=document.getElementById("stokListesi");let tk=Object.keys(stokBilgileri).sort();if(arama){let ak=arama.toLowerCase();tk=tk.filter(k=>k.toLowerCase().includes(ak)||(stokBilgileri[k]||"").toLowerCase().includes(ak))}if(tk.length===0){c.innerHTML="<p>Stok bulunamadı.</p>";return}let h='';tk.forEach(k=>{h+='<div class="stok-card"><span><strong>'+dotTemizle(k)+'</strong></span><span style="color:#666;font-size:13px">'+stokBilgileri[k]+'</span><span style="color:#2980b9;font-weight:600">'+formatNumberDisplay(plakaWeights[k])+' kg</span>';h+='<div><button class="btn btn-info btn-xs" onclick="stokDuzenleModalAc(\''+k+'\')">✏️</button> <button class="btn btn-danger btn-xs" onclick="stokSil(\''+k+'\')">🗑️</button></div></div>'});c.innerHTML=h}
-window.stokDuzenleModalAc=function(k){duzenlenenStokKodu=k;document.getElementById("duzenleStokKodu").value=dotTemizle(k);document.getElementById("duzenleStokIsmi").value=stokBilgileri[k]||"";document.getElementById("duzenleStokPlaka").value=plakaWeights[k]||0;document.getElementById("duzenleStokGrup").value=stokGruplari[k]||"430";document.getElementById("stokDuzenleModal").style.display="block"};
-document.getElementById("stokGuncelleBtn").onclick=function(){let k=duzenlenenStokKodu;if(!k)return;let yi=document.getElementById("duzenleStokIsmi").value.trim();let yps=document.getElementById("duzenleStokPlaka").value;let yg=document.getElementById("duzenleStokGrup").value;if(!yi||!yps){alert("Zorunlu alanlar!");return}let yp=parseNumber(yps);if(yp<=0){alert("Geçerli plaka!");return}stokBilgileri[k]=yi;plakaWeights[k]=yp;stokGruplari[k]=yg;urunleriGuncelle();syncData();document.getElementById("stokDuzenleModal").style.display="none";stokListesiniGoster(document.getElementById("stokArama").value)};
-window.stokSil=function(k){if(!confirm(dotTemizle(k)+" silinsin mi?"))return;delete stokBilgileri[k];delete plakaWeights[k];delete stokGruplari[k];urunleriGuncelle();syncData();stokListesiniGoster(document.getElementById("stokArama").value)};
+function stokListesiniGoster(arama){
+    let c=document.getElementById("stokListesi");let tk=Object.keys(stokBilgileri).sort();
+    if(arama){let ak=arama.toLowerCase();tk=tk.filter(k=>k.toLowerCase().includes(ak)||(stokBilgileri[k]||"").toLowerCase().includes(ak))}
+    if(tk.length===0){c.innerHTML="<p>Stok bulunamadı.</p>";return}
+    let h='';tk.forEach(k=>{
+        h+='<div class="stok-card"><span><strong>'+dotTemizle(k)+'</strong></span><span style="color:#666;font-size:13px">'+stokBilgileri[k]+'</span><span style="color:#2980b9;font-weight:600">'+formatNumberDisplay(plakaWeights[k])+' kg</span>';
+        h+='<div><button class="btn btn-info btn-xs" onclick="stokDuzenleModalAc(\''+k+'\')">✏️</button> <button class="btn btn-danger btn-xs" onclick="stokSil(\''+k+'\')">🗑️</button></div></div>';
+    });c.innerHTML=h;
+}
+window.stokDuzenleModalAc=function(k){
+    duzenlenenStokKodu=k;
+    document.getElementById("duzenleStokKodu").value=dotTemizle(k);
+    document.getElementById("duzenleStokIsmi").value=stokBilgileri[k]||"";
+    document.getElementById("duzenleStokPlaka").value=plakaWeights[k]||0;
+    document.getElementById("duzenleStokGrup").value=stokGruplari[k]||"430";
+    document.getElementById("stokDuzenleModal").style.display="block";
+};
+document.getElementById("stokGuncelleBtn").onclick=function(){
+    let k=duzenlenenStokKodu;if(!k)return;
+    let yi=document.getElementById("duzenleStokIsmi").value.trim();
+    let yps=document.getElementById("duzenleStokPlaka").value;
+    let yg=document.getElementById("duzenleStokGrup").value;
+    if(!yi||!yps){alert("Zorunlu alanlar!");return}
+    let yp=parseNumber(yps);if(yp<=0){alert("Geçerli plaka!");return}
+    stokBilgileri[k]=yi;plakaWeights[k]=yp;stokGruplari[k]=yg;urunleriGuncelle();syncData();
+    document.getElementById("stokDuzenleModal").style.display="none";
+    stokListesiniGoster(document.getElementById("stokArama").value);
+};
+window.stokSil=function(k){
+    if(!confirm(dotTemizle(k)+" silinsin mi?"))return;
+    delete stokBilgileri[k];delete plakaWeights[k];delete stokGruplari[k];urunleriGuncelle();syncData();
+    stokListesiniGoster(document.getElementById("stokArama").value);
+};
 
-function ajandaSayfasiniAc(){document.getElementById("yeniGirisAlan").classList.add("hidden");document.getElementById("oncekiGirislerAlan").classList.add("hidden");document.getElementById("stokDuzenleAlan").classList.add("hidden");document.getElementById("ajandaAlan").classList.remove("hidden");let ys=document.getElementById("ajandaYil");ys.innerHTML='';let sy=new Date().getFullYear();for(let y=sy-2;y<=sy+2;y++){ys.innerHTML+='<option value="'+y+'" '+(y===sy?'selected':'')+'>'+y+'</option>'}document.getElementById("ajandaAy").value=new Date().getMonth()+1;ajandaGetir()}
+// ==================== AJANDA ====================
+function ajandaSayfasiniAc(){
+    document.getElementById("yeniGirisAlan").classList.add("hidden");
+    document.getElementById("oncekiGirislerAlan").classList.add("hidden");
+    document.getElementById("stokDuzenleAlan").classList.add("hidden");
+    document.getElementById("ajandaAlan").classList.remove("hidden");
+    let ys=document.getElementById("ajandaYil");ys.innerHTML='';
+    let sy=new Date().getFullYear();
+    for(let y=sy-2;y<=sy+2;y++){ys.innerHTML+='<option value="'+y+'" '+(y===sy?'selected':'')+'>'+y+'</option>'}
+    document.getElementById("ajandaAy").value=new Date().getMonth()+1;
+    ajandaGetir();
+}
 document.getElementById("ajandaGetirBtn").onclick=ajandaGetir;
-function ajandaGetir(){let yil=parseInt(document.getElementById("ajandaYil").value);let ay=parseInt(document.getElementById("ajandaAy").value);let gs=new Date(yil,ay,0).getDate();let anahtar=yil+"_"+ay;let kayitli=ajandaVerileri[anahtar]||{};let h='<table><thead><tr><th>Gün</th><th>Tarih</th><th>Seri No</th><th>Açıklama / Sıra No</th></tr></thead><tbody>';for(let g=1;g<=gs;g++){let tarih=g+"/"+ay+"/"+yil;let gk="gun_"+g;let sn=kayitli[gk]?kayitli[gk].seri:"";let aciklama=kayitli[gk]?(kayitli[gk].aciklama||kayitli[gk].sira||kayitli[gk].not||""):"";h+='<tr><td>'+g+'</td><td>'+tarih+'</td>';h+='<td><input type="text" class="ajanda-not-input ajanda-seri" data-gun="'+g+'" value="'+sn+'" style="width:100px;"></td>';h+='<td><input type="text" class="ajanda-not-input ajanda-aciklama" data-gun="'+g+'" value="'+aciklama+'" style="width:100%;min-width:300px;" placeholder="Sıra numaralarını girin..."></td></tr>'}h+='</tbody></table>';document.getElementById("ajandaTablosu").innerHTML=h;document.getElementById("ajandaMesaj").innerHTML=""}
-document.getElementById("ajandaKaydetBtn").onclick=function(){let yil=parseInt(document.getElementById("ajandaYil").value);let ay=parseInt(document.getElementById("ajandaAy").value);let anahtar=yil+"_"+ay;let kayit={};document.querySelectorAll("#ajandaTablosu tbody tr").forEach(tr=>{let se=tr.querySelector('.ajanda-seri');let ae=tr.querySelector('.ajanda-aciklama');if(se&&ae){let g=se.dataset.gun;kayit["gun_"+g]={seri:se.value,aciklama:ae.value}}});ajandaVerileri[anahtar]=kayit;saveToFirebase().then(()=>{document.getElementById("ajandaMesaj").innerHTML="<span class='success'>✅ Ajanda kaydedildi! ("+ay+"/"+yil+")</span>"}).catch(()=>{document.getElementById("ajandaMesaj").innerHTML="<span class='error'>❌ Kayıt hatası!</span>"})};
-document.getElementById("ajandaExcelBtn").onclick=function(){let yil=document.getElementById("ajandaYil").value;let ay=document.getElementById("ajandaAy").value;let ayAdi=document.getElementById("ajandaAy").options[document.getElementById("ajandaAy").selectedIndex].text;let excelHtml='<html><head><meta charset="UTF-8"><style>th{background:#2c3e50;color:white;padding:8px}td{padding:8px;border:1px solid black}</style></head><body>';excelHtml+='<h2>SAC4 Ajanda - '+ayAdi+' '+yil+'</h2>';excelHtml+='<table border="1"><tr><th>Gün</th><th>Tarih</th><th>Seri No</th><th>Açıklama / Sıra No</th></tr>';document.querySelectorAll("#ajandaTablosu tbody tr").forEach(tr=>{let gun=tr.cells[0]?tr.cells[0].textContent:"";let tarih=tr.cells[1]?tr.cells[1].textContent:"";let seri=tr.querySelector('.ajanda-seri')?tr.querySelector('.ajanda-seri').value:"";let aciklama=tr.querySelector('.ajanda-aciklama')?tr.querySelector('.ajanda-aciklama').value:"";excelHtml+='<tr><td>'+gun+'</td><td>'+tarih+'</td><td>'+seri+'</td><td>'+aciklama+'</td></tr>'});excelHtml+='</table></body></html>';let blob=new Blob([excelHtml],{type:'application/vnd.ms-excel;charset=utf-8'});let link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download="SAC4_Ajanda_"+ayAdi+"_"+yil+".xls";link.click();URL.revokeObjectURL(link.href);document.getElementById("ajandaMesaj").innerHTML="<span class='success'>✅ Ajanda Excel'e aktarıldı!</span>"};
+function ajandaGetir(){
+    let yil=parseInt(document.getElementById("ajandaYil").value);
+    let ay=parseInt(document.getElementById("ajandaAy").value);
+    let gs=new Date(yil,ay,0).getDate();
+    let anahtar=yil+"_"+ay;
+    let kayitli=ajandaVerileri[anahtar]||{};
+    let h='<table><thead><tr><th>Gün</th><th>Tarih</th><th>Seri No</th><th>Açıklama / Sıra No</th></tr></thead><tbody>';
+    for(let g=1;g<=gs;g++){
+        let tarih=g+"/"+ay+"/"+yil;let gk="gun_"+g;
+        let sn=kayitli[gk]?kayitli[gk].seri:"";
+        let aciklama=kayitli[gk]?(kayitli[gk].aciklama||kayitli[gk].sira||kayitli[gk].not||""):"";
+        h+='<tr><td>'+g+'</td><td>'+tarih+'</td>';
+        h+='<td><input type="text" class="ajanda-not-input ajanda-seri" data-gun="'+g+'" value="'+sn+'" style="width:100px;"></td>';
+        h+='<td><input type="text" class="ajanda-not-input ajanda-aciklama" data-gun="'+g+'" value="'+aciklama+'" style="width:100%;min-width:300px;" placeholder="Sıra numaralarını girin..."></td></tr>';
+    }
+    h+='</tbody></table>';document.getElementById("ajandaTablosu").innerHTML=h;document.getElementById("ajandaMesaj").innerHTML="";
+}
+document.getElementById("ajandaKaydetBtn").onclick=function(){
+    let yil=parseInt(document.getElementById("ajandaYil").value);
+    let ay=parseInt(document.getElementById("ajandaAy").value);
+    let anahtar=yil+"_"+ay;let kayit={};
+    document.querySelectorAll("#ajandaTablosu tbody tr").forEach(tr=>{
+        let se=tr.querySelector('.ajanda-seri');let ae=tr.querySelector('.ajanda-aciklama');
+        if(se&&ae){let g=se.dataset.gun;kayit["gun_"+g]={seri:se.value,aciklama:ae.value}}
+    });
+    ajandaVerileri[anahtar]=kayit;
+    saveToFirebase().then(()=>{document.getElementById("ajandaMesaj").innerHTML="<span class='success'>✅ Ajanda kaydedildi! ("+ay+"/"+yil+")</span>"}).catch(()=>{document.getElementById("ajandaMesaj").innerHTML="<span class='error'>❌ Kayıt hatası!</span>"});
+};
+document.getElementById("ajandaExcelBtn").onclick=function(){
+    let yil=document.getElementById("ajandaYil").value;
+    let ay=document.getElementById("ajandaAy").value;
+    let ayAdi=document.getElementById("ajandaAy").options[document.getElementById("ajandaAy").selectedIndex].text;
+    let excelHtml='<html><head><meta charset="UTF-8"><style>th{background:#2c3e50;color:white;padding:8px}td{padding:8px;border:1px solid black}</style></head><body>';
+    excelHtml+='<h2>SAC4 Ajanda - '+ayAdi+' '+yil+'</h2>';
+    excelHtml+='<table border="1"><tr><th>Gün</th><th>Tarih</th><th>Seri No</th><th>Açıklama / Sıra No</th></tr>';
+    document.querySelectorAll("#ajandaTablosu tbody tr").forEach(tr=>{
+        let gun=tr.cells[0]?tr.cells[0].textContent:"";
+        let tarih=tr.cells[1]?tr.cells[1].textContent:"";
+        let seri=tr.querySelector('.ajanda-seri')?tr.querySelector('.ajanda-seri').value:"";
+        let aciklama=tr.querySelector('.ajanda-aciklama')?tr.querySelector('.ajanda-aciklama').value:"";
+        excelHtml+='<tr><td>'+gun+'</td><td>'+tarih+'</td><td>'+seri+'</td><td>'+aciklama+'</td></tr>';
+    });
+    excelHtml+='</table></body></html>';let blob=new Blob([excelHtml],{type:'application/vnd.ms-excel;charset=utf-8'});let link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download="SAC4_Ajanda_"+ayAdi+"_"+yil+".xls";link.click();URL.revokeObjectURL(link.href);
+    document.getElementById("ajandaMesaj").innerHTML="<span class='success'>✅ Ajanda Excel'e aktarıldı!</span>";
+};
 
 window.kapatModal=function(id){document.getElementById(id).style.display="none";if(id==='detayModal')detayEditingIdx=null};
 window.onclick=function(e){if(e.target.classList.contains('modal')){e.target.style.display="none";if(e.target.id==='detayModal')detayEditingIdx=null}};
 
-console.log("✅ SAC4 - Hazır! Tarih Aralıklı Özet + Excel + Ajanda");
+console.log("✅ SAC4 - Hazır! Yeni stok listesi ile güncellendi.");
 </script>
 </body>
 </html>
